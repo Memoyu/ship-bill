@@ -8,6 +8,17 @@ const _sfc_main = {
     };
   },
   onLoad() {
+
+    wx.cloud.callFunction({
+      name: 'shipBillFunctions',
+      data: {
+        type: 'getCategories'
+      }
+    }).then((resp) => {
+      console.log(resp)
+    }).catch((e) => {
+      console.log(e);
+    });
   },
   methods: {}
 };
