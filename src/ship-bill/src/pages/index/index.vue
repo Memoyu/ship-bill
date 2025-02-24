@@ -3,7 +3,7 @@
 {
   style: {
     navigationStyle: 'custom',
-    navigationBarTitleText: '流水',
+    navigationBarTitleText: '首页',
   },
 }
 </route>
@@ -12,12 +12,19 @@
     class="bg-white overflow-hidden pt-2 px-4"
     :style="{ marginTop: safeAreaInsets?.top + 'px' }"
   >
-    <wd-button type="success">成功按钮</wd-button>
-    <view class="text-center mt-4">这是 流水</view>
+    <UserInfo />
+    <wd-fab
+      type="primary"
+      position="right-bottom"
+      activeIcon="add"
+      :gap="{ right: 40, bottom: 60 }"
+    />
   </view>
 </template>
 
 <script lang="ts" setup>
+import UserInfo from './components/user/index.vue'
+
 defineOptions({
   name: 'Bill',
 })
