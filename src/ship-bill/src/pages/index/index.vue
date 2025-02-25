@@ -16,12 +16,7 @@
     <!-- 这是底部撑起来的 -->
     <view style="height: 90px" />
 
-    <wd-floating-panel :anchors="anchors">
-      <wd-cell-group border>
-        <wd-cell v-for="item in data" :key="item" :title="item" />
-      </wd-cell-group>
-    </wd-floating-panel>
-
+    <BillPanel />
     <wd-fab
       type="primary"
       position="right-bottom"
@@ -36,48 +31,16 @@ import UserInfo from './components/user/index.vue'
 import Summary from './components/summary/index.vue'
 import Report from './components/report/index.vue'
 import Func from './components/func/index.vue'
+import BillPanel from './components/bill/index.vue'
 
 defineOptions({
   name: 'Index',
 })
 
-const data = [
-  'A',
-  'B',
-  'C',
-  'D',
-  'E',
-  'F',
-  'G',
-  'H',
-  'I',
-  'J',
-  'K',
-  'L',
-  'M',
-  'N',
-  'O',
-  'P',
-  'Q',
-  'R',
-  'S',
-  'T',
-  'U',
-  'V',
-  'W',
-  'X',
-  'Y',
-  'Z',
-]
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
-const windowHeight = ref<number>(0)
-const anchors = ref<number[]>([])
 
-onLoad(() => {
-  windowHeight.value = uni.getSystemInfoSync().windowHeight
-  anchors.value = [80, Math.round(0.6 * windowHeight.value)]
-})
+onLoad(() => {})
 </script>
 
 <style></style>
