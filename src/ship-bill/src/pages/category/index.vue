@@ -3,7 +3,7 @@
 {
   style: {
     navigationStyle: 'custom',
-    navigationBarTitleText: '报表',
+    navigationBarTitleText: '分类管理',
   },
 }
 </route>
@@ -13,12 +13,12 @@
       fixed
       safeAreaInsetTop
       placeholder
-      title="报表"
+      title="分类管理"
       left-text="返回"
       left-arrow
       @click-left="handleClickLeft"
       :bordered="false"
-    />
+    ></wd-navbar>
   </view>
 </template>
 

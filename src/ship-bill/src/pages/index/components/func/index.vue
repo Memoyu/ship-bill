@@ -1,11 +1,11 @@
 <template>
   <view class="grid grid-cols-3 gap-2">
-    <view class="func-col-1 func-text">账单汇总</view>
-    <view class="func-col-1 func-text">数据报表</view>
-    <view class="func-col-1 func-text">分类管理</view>
-    <view class="func-col-2 col-span-2 bg-indigo-500 relative">
+    <view class="func-col-1 func-text" @click="handleClickChart">图表</view>
+    <view class="func-col-1 func-text" @click="handleClickReport">报表</view>
+    <view class="func-col-1 func-text" @click="handleClickCategory">分类管理</view>
+    <view class="func-col-2 col-span-2 bg-indigo-500 relative" @click="handleClickSetting">
       <view class="func-text">设置</view>
-      <view class="absolute bottom-1 flex">
+      <view class="absolute bottom-1 flex text-base">
         <view>产值: 90</view>
         <view class="ml-2">油价: 7.8</view>
       </view>
@@ -14,7 +14,31 @@
   </view>
 </template>
 
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+const handleClickSetting = () => {
+  uni.navigateTo({
+    url: '/pages/setting/index',
+  })
+}
+
+const handleClickChart = () => {
+  uni.navigateTo({
+    url: '/pages/chart/index',
+  })
+}
+
+const handleClickCategory = () => {
+  uni.navigateTo({
+    url: '/pages/category/index',
+  })
+}
+
+const handleClickReport = () => {
+  uni.navigateTo({
+    url: '/pages/report/index',
+  })
+}
+</script>
 
 <style lang="scss">
 .func-col-1 {

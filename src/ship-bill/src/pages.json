@@ -23,6 +23,14 @@
       }
     },
     {
+      "path": "pages/category/index",
+      "type": "page",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "分类管理"
+      }
+    },
+    {
       "path": "pages/chart/index",
       "type": "page",
       "style": {
@@ -36,6 +44,14 @@
       "style": {
         "navigationStyle": "custom",
         "navigationBarTitleText": "报表"
+      }
+    },
+    {
+      "path": "pages/setting/index",
+      "type": "page",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "设置"
       }
     },
     {
