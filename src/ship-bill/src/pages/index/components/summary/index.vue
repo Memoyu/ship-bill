@@ -1,5 +1,5 @@
 <template>
-  <view class="grid grid-cols-2 gap-2">
+  <view class="grid grid-cols-2 gap-2 mb-4">
     <view class="summary-block bg-indigo-400">
       <view class="summary-block-item">
         <wd-text color="#FFF" size="15px" text="支出" bold />

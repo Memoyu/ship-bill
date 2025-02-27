@@ -1,6 +1,6 @@
-<!-- 使用 type="home" 属性设置首页，其他页面不需要设置，默认为page；推荐使用json5，更强大，且允许注释 -->
-<route lang="json5">
+<route lang="json5" type="page">
 {
+  layout: 'default',
   style: {
     navigationStyle: 'custom',
     navigationBarTitleText: '用户',
@@ -8,11 +8,58 @@
 }
 </route>
 <template>
-  <view
-    class="bg-white overflow-hidden pt-2 px-4"
-    :style="{ marginTop: safeAreaInsets?.top + 'px' }"
-  >
-    <view class="text-center mt-4">这是 用户</view>
+  <view>
+    <wd-navbar
+      fixed
+      safeAreaInsetTop
+      placeholder
+      title="用户"
+      left-text="返回"
+      left-arrow
+      @click-left="handleClickLeft"
+      :bordered="false"
+    />
+    <view class="bg-white overflow-hidden pt-2 mt-4">
+      <view class="flex flex-col justify-between">
+        <wd-cell-group border>
+          <wd-input
+            label="公司"
+            label-width="50px"
+            no-border
+            type="text"
+            v-model="user.company"
+            placeholder="请输入公司"
+          />
+          <wd-input
+            label="姓名"
+            label-width="50px"
+            no-border
+            type="text"
+            v-model="user.name"
+            placeholder="请输入姓名"
+          />
+          <wd-input
+            label="电话"
+            label-width="50px"
+            no-border
+            type="text"
+            v-model="user.phone"
+            placeholder="请输入电话"
+          />
+          <wd-input
+            label="车牌"
+            label-width="50px"
+            no-border
+            type="text"
+            v-model="user.license_plate"
+            placeholder="请输入车牌"
+          />
+        </wd-cell-group>
+      </view>
+      <view class="w-full flex justify-center absolute bottom-8">
+        <wd-button :loading="saveLoading">保存</wd-button>
+      </view>
+    </view>
   </view>
 </template>
 
@@ -21,14 +68,19 @@ defineOptions({
   name: 'User',
 })
 
-// 获取屏幕边界到安全区域距离
-const { safeAreaInsets } = uni.getSystemInfoSync()
+const saveLoading = ref<boolean>(false)
+const user = {
+  company: '',
+  name: '',
+  phone: '',
+  license_plate: '',
+}
 
 onLoad(() => {})
+
+function handleClickLeft() {
+  uni.navigateBack()
+}
 </script>
 
-<style>
-.main-title-color {
-  color: #d14328;
-}
-</style>
+<style></style>

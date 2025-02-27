@@ -1,5 +1,6 @@
-<route lang="json5">
+<route lang="json5" type="page">
 {
+  layout: 'default',
   style: {
     navigationStyle: 'custom',
     navigationBarTitleText: '设置',
@@ -19,9 +20,9 @@
       @click-left="handleClickLeft"
       :bordered="false"
     />
-    <view class="bg-white overflow-hidden pt-2 px-4">
-      <view class="mt-3">
-        <wd-cell-group>
+    <view class="bg-white overflow-hidden mt-4">
+      <view class="flex flex-col justify-between">
+        <wd-cell-group border>
           <wd-cell title="产值(%点)">
             <wd-input-number v-model="outputValue" :min="0" :max="100" :precision="2" />
           </wd-cell>
@@ -29,10 +30,10 @@
             <wd-input-number v-model="oilPrices" :min="0" :max="20" :precision="2" />
           </wd-cell>
         </wd-cell-group>
-        <view class="mt-5 flex justify-center">
-          <wd-button :loading="saveLoading">保存</wd-button>
-        </view>
       </view>
+    </view>
+    <view class="w-full flex justify-center absolute bottom-8">
+      <wd-button :loading="saveLoading">保存</wd-button>
     </view>
   </view>
 </template>
@@ -53,8 +54,4 @@ function handleClickLeft() {
 }
 </script>
 
-<style>
-.main-title-color {
-  color: #d14328;
-}
-</style>
+<style></style>
