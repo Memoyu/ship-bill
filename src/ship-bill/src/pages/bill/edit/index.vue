@@ -114,7 +114,9 @@
       />
     </view>
     <view class="w-full absolute bottom-8">
-      <wd-button block custom-class="custom-shadow" :loading="saveLoading">保存</wd-button>
+      <view class="mx-6">
+        <wd-button block custom-class="custom-shadow" :loading="saveLoading">保存</wd-button>
+      </view>
     </view>
   </view>
 </template>

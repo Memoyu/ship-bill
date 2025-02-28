@@ -118,7 +118,6 @@ watch(
 )
 
 onLoad(() => {
-  console.log('加载。。。。')
   selected.value = categories[0]
 })
 

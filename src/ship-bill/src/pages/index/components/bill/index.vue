@@ -1,9 +1,9 @@
 <template>
-  <wd-floating-panel :anchors="anchors">
+  <wd-floating-panel v-model:height="height" :anchors="anchors">
     <view class="z-50 sticky top-0 bg-white px-5 py-4">
       <view class="flex justify-between items-center">
         <view class="font-bold">当前账单</view>
-        <view class="font-bold">2016-05-03</view>
+        <view class="font-bold">{{ currentDate }}</view>
       </view>
       <view class="mt-4">
         <wd-segmented
@@ -39,6 +39,8 @@
 </template>
 
 <script lang="ts" setup>
+import dayjs from 'dayjs'
+
 const data = [
   {
     _id: '11111',
@@ -89,14 +91,26 @@ const data = [
     remark: '测试备注3',
   },
 ]
+const props = defineProps<{ date: string }>()
+
 const types = ref(['全部', '支出', '收入'])
 const type = ref('全部')
-const windowHeight = ref<number>(0)
+const height = ref<number>(80)
+const { windowHeight } = uni.getSystemInfoSync()
+const maxHeight = ref<number>(0)
 const anchors = ref<number[]>([])
+const currentDate = ref(dayjs().format('YYYY-MM-DD'))
 
+watch(
+  () => props.date,
+  (nweDate) => {
+    currentDate.value = nweDate
+    height.value = maxHeight.value
+  },
+)
 onLoad(() => {
-  windowHeight.value = uni.getSystemInfoSync().windowHeight
-  anchors.value = [80, Math.round(0.6 * windowHeight.value)]
+  maxHeight.value = Math.round(0.6 * windowHeight)
+  anchors.value = [80, maxHeight.value]
 })
 
 const handleChangeType = () => {

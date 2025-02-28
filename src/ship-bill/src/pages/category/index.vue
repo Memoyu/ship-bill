@@ -60,8 +60,8 @@ const expends = [
 ]
 
 const types = ref(['支出', '收入'])
-const type = ref('支出')
-const categories = ref<any[]>(incomes)
+const type = ref<string>('支出')
+const categories = ref<any[]>(expends)
 
 onLoad(() => {})
 
@@ -69,7 +69,8 @@ const handleClickLeft = () => {
   uni.navigateBack()
 }
 
-const handleChangeType = (value: string) => {
+const handleChangeType = ({ value }) => {
+  console.log(value)
   categories.value = value === '收入' ? incomes : expends
 }
 

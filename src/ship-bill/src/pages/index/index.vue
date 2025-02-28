@@ -12,12 +12,12 @@
     <User />
     <view class="px-4">
       <Summary />
-      <Report />
+      <Report @click="handleClickSummary" />
       <Func />
       <!-- 这是底部撑起来的 -->
       <view style="height: 90px" />
 
-      <BillPanel />
+      <BillPanel :date="summaryDate" />
       <wd-fab
         :expandable="false"
         type="primary"
@@ -41,12 +41,19 @@ defineOptions({
   name: 'Index',
 })
 
+const summaryDate = ref('')
+
 onLoad(() => {})
 
 const handleClickAddBill = () => {
   uni.navigateTo({
     url: '/pages/bill/edit/index',
   })
+}
+
+const handleClickSummary = (date: string) => {
+  console.log(date)
+  summaryDate.value = date
 }
 </script>
 

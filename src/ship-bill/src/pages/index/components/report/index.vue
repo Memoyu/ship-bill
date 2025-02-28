@@ -1,6 +1,11 @@
 <template>
   <view class="container h-3/6 py-2 rounded-lg bg-indigo-400 mb-4">
-    <view v-for="(summary, index) in data" :key="index" class="p-2 m-2 bg-white rounded-md">
+    <view
+      v-for="(summary, index) in data"
+      :key="index"
+      class="p-2 m-2 bg-white rounded-md"
+      @click="() => handleClickItem(summary)"
+    >
       <view class="grid grid-cols-9 gap-3 items-center">
         <view class="col-span-3 flex flex-col">
           <view>{{ dayjs(summary.date).year() }}</view>
@@ -15,6 +20,10 @@
 
 <script lang="ts" setup>
 import dayjs from 'dayjs'
+
+const emits = defineEmits<{
+  (e: 'click', value: string): void
+}>()
 
 const data = [
   {
@@ -68,4 +77,9 @@ const data = [
     income: 24,
   },
 ]
+
+const handleClickItem = (summary: any) => {
+  // console.log('summary', summary)
+  emits('click', summary.date)
+}
 </script>
