@@ -23,10 +23,10 @@
     <view class="bg-white overflow-hidden mt-4">
       <view class="flex flex-col justify-between">
         <wd-cell-group border>
-          <wd-cell title="产值(%点)">
+          <wd-cell size="large" title="产值(%点)">
             <wd-input-number v-model="outputValue" :min="0" :max="100" :precision="2" />
           </wd-cell>
-          <wd-cell title="油价(元)">
+          <wd-cell size="large" title="油价(元)">
             <wd-input-number v-model="oilPrices" :min="0" :max="20" :precision="2" />
           </wd-cell>
         </wd-cell-group>

@@ -19,20 +19,20 @@
       @click-left="handleClickLeft"
       :bordered="false"
     />
-
-    <wd-tabs v-model="type">
-      <wd-tab title="收入">
-        <Labels :type="1" :labels="incomes" />
-      </wd-tab>
-
-      <wd-tab title="支出">
-        <Labels :type="2" :labels="expends" />
-      </wd-tab>
-    </wd-tabs>
+    <view>
+      <wd-segmented
+        :options="types"
+        v-model:value="type"
+        size="middle"
+        @change="handleChangeType"
+      />
+      <Labels :type="2" :labels="categories" />
+    </view>
   </view>
 </template>
 
 <script lang="ts" setup>
+import { SegmentedOption } from 'wot-design-uni/components/wd-segmented/types'
 import Labels from './components/labels/index.vue'
 
 defineOptions({
@@ -50,6 +50,7 @@ const incomes = [
 ]
 
 const expends = [
+  { _id: '000011', name: '加油', base: true },
   { _id: '111111', name: '尿素', base: true },
   { _id: '222222', name: '停车费', base: true },
   { _id: '333333', name: '换柜费', base: true },
@@ -58,12 +59,18 @@ const expends = [
   { _id: '666666', name: '修柜费', base: false },
 ]
 
-const type = ref<string>('0')
+const types = ref(['支出', '收入'])
+const type = ref('支出')
+const categories = ref<any[]>(incomes)
 
 onLoad(() => {})
 
-function handleClickLeft() {
+const handleClickLeft = () => {
   uni.navigateBack()
+}
+
+const handleChangeType = (value: string) => {
+  categories.value = value === '收入' ? incomes : expends
 }
 
 const handleClickAddIncome = () => {}

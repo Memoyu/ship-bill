@@ -32,26 +32,29 @@
           </view>
         </view>
 
-        <wd-tabs v-model="type">
-          <wd-tab title="全部" />
-          <wd-tab title="收入" />
-          <wd-tab title="支出" />
-        </wd-tabs>
+        <view class="my-2">
+          <wd-segmented
+            :options="types"
+            v-model:value="type"
+            size="middle"
+            @change="handleChangeType"
+          />
+        </view>
 
-        <view class="flex justify-between px-3">
-          <view v-if="type == '0' || type == '1'">
-            <wd-text size="15px" bold text="收: " />
-            <wd-text size="15px" type="primary" bold mode="price" text="900000" />
-          </view>
-          <view v-if="type == '0' || type == '2'">
+        <view :class="['flex', 'px-3', type == types[0] ? 'justify-between' : 'justify-center']">
+          <view v-if="type == types[0] || type == types[1]">
             <wd-text size="15px" bold text="支: " />
             <wd-text size="15px" type="error" bold mode="price" text="900000" />
+          </view>
+          <view v-if="type == types[0] || type == types[2]">
+            <wd-text size="15px" bold text="收: " />
+            <wd-text size="15px" type="primary" bold mode="price" text="900000" />
           </view>
         </view>
       </view>
 
-      <view v-for="d in data" :key="d._id">
-        <BillItem :bill="d" />
+      <view v-for="bill in data" :key="bill._id">
+        <BillItem :bill="bill" />
       </view>
     </view>
   </view>
@@ -142,8 +145,8 @@ const data = [
     remark: '测试备注3',
   },
 ]
-
-const type = ref<string>('0')
+const types = ref(['全部', '支出', '收入'])
+const type = ref('全部')
 const value = ref<any[]>([dayjs().subtract(1, 'day').toDate(), Date.now()])
 
 onLoad(() => {})
@@ -154,6 +157,10 @@ function handleClickLeft() {
 
 function handleConfirm({ value }) {
   console.log(new Date(value))
+}
+
+const handleChangeType = () => {
+  console.log(type.value)
 }
 </script>
 

@@ -26,6 +26,7 @@
             label="公司"
             label-width="50px"
             no-border
+            size="large"
             type="text"
             v-model="user.company"
             placeholder="请输入公司"
@@ -34,6 +35,7 @@
             label="姓名"
             label-width="50px"
             no-border
+            size="large"
             type="text"
             v-model="user.name"
             placeholder="请输入姓名"
@@ -42,6 +44,7 @@
             label="电话"
             label-width="50px"
             no-border
+            size="large"
             type="text"
             v-model="user.phone"
             placeholder="请输入电话"
@@ -50,6 +53,7 @@
             label="车牌"
             label-width="50px"
             no-border
+            size="large"
             type="text"
             v-model="user.license_plate"
             placeholder="请输入车牌"

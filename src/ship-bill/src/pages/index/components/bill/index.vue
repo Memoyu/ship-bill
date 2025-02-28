@@ -5,15 +5,18 @@
         <view class="font-bold">当前账单</view>
         <view class="font-bold">2016-05-03</view>
       </view>
-      <wd-tabs v-model="type">
-        <wd-tab title="全部" />
-        <wd-tab title="收入" />
-        <wd-tab title="支出" />
-      </wd-tabs>
+      <view class="mt-4">
+        <wd-segmented
+          :options="types"
+          v-model:value="type"
+          size="middle"
+          @change="handleChangeType"
+        />
+      </view>
     </view>
     <wd-cell-group border>
       <view class="container">
-        <view v-for="d in data" :key="d._id" class="p-2 m-2 bg-slate-100 rounded-md">
+        <view v-for="bill in data" :key="bill._id" class="p-2 m-2 bg-slate-100 rounded-md">
           <view class="flex flex-row items-center">
             <view class="flex-1 flex flex-row items-center" style="flex-grow: 1">
               <wd-img
@@ -24,10 +27,10 @@
               />
               <view class="flex-1 col-span-3 flex flex-col ml-2 text-base">
                 <view>{{ 'ddddd' }}</view>
-                <wd-text :lines="1" :text="d.remark" />
+                <wd-text :lines="1" :text="bill.remark" />
               </view>
             </view>
-            <wd-text class="float-right" mode="price" :text="d.amount" bold />
+            <wd-text class="float-right" mode="price" :text="bill.amount" bold />
           </view>
         </view>
       </view>
@@ -86,12 +89,17 @@ const data = [
     remark: '测试备注3',
   },
 ]
+const types = ref(['全部', '支出', '收入'])
+const type = ref('全部')
 const windowHeight = ref<number>(0)
 const anchors = ref<number[]>([])
-const type = ref<string>('0')
 
 onLoad(() => {
   windowHeight.value = uni.getSystemInfoSync().windowHeight
   anchors.value = [80, Math.round(0.6 * windowHeight.value)]
 })
+
+const handleChangeType = () => {
+  console.log(type.value)
+}
 </script>

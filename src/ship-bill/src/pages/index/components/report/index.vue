@@ -1,13 +1,13 @@
 <template>
   <view class="container h-3/6 py-2 rounded-lg bg-indigo-400 mb-4">
-    <view v-for="d in data" :key="d.date" class="p-2 m-2 bg-white rounded-md">
+    <view v-for="(summary, index) in data" :key="index" class="p-2 m-2 bg-white rounded-md">
       <view class="grid grid-cols-9 gap-3 items-center">
         <view class="col-span-3 flex flex-col">
-          <view>{{ dayjs(d.date).year() }}</view>
-          <wd-text color="#000" :text="dayjs(d.date).format('MM-DD')" bold />
+          <view>{{ dayjs(summary.date).year() }}</view>
+          <wd-text color="#000" :text="dayjs(summary.date).format('MM-DD')" bold />
         </view>
-        <view class="col-span-3">收: {{ d.income }}</view>
-        <view class="col-span-3">支: {{ d.expend }}</view>
+        <view class="col-span-3">收: {{ summary.income }}</view>
+        <view class="col-span-3">支: {{ summary.expend }}</view>
       </view>
     </view>
   </view>
