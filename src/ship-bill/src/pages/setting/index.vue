@@ -1,6 +1,7 @@
 <route lang="json5" type="page">
 {
   layout: 'default',
+  needLogin: true,
   style: {
     navigationStyle: 'custom',
     navigationBarTitleText: '设置',
@@ -51,7 +52,7 @@ const saveLoading = ref<boolean>(false)
 
 onLoad(() => {})
 
-function handleClickLeft() {
+const handleClickLeft = () => {
   uni.navigateBack()
 }
 </script>

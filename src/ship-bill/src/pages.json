@@ -27,6 +27,7 @@
       "path": "pages/category/index",
       "type": "page",
       "layout": "default",
+      "needLogin": true,
       "style": {
         "navigationStyle": "custom",
         "navigationBarTitleText": "分类管理"
@@ -36,6 +37,7 @@
       "path": "pages/chart/index",
       "type": "page",
       "layout": "default",
+      "needLogin": true,
       "style": {
         "navigationStyle": "custom",
         "navigationBarTitleText": "图表"
@@ -45,6 +47,7 @@
       "path": "pages/report/index",
       "type": "page",
       "layout": "default",
+      "needLogin": true,
       "style": {
         "navigationStyle": "custom",
         "navigationBarTitleText": "报表"
@@ -54,6 +57,7 @@
       "path": "pages/setting/index",
       "type": "page",
       "layout": "default",
+      "needLogin": true,
       "style": {
         "navigationStyle": "custom",
         "navigationBarTitleText": "设置"
@@ -63,6 +67,7 @@
       "path": "pages/user/index",
       "type": "page",
       "layout": "default",
+      "needLogin": true,
       "style": {
         "navigationStyle": "custom",
         "navigationBarTitleText": "用户"
@@ -72,9 +77,19 @@
       "path": "pages/bill/edit/index",
       "type": "page",
       "layout": "default",
+      "needLogin": true,
       "style": {
         "navigationStyle": "custom",
-        "navigationBarTitleText": "用户"
+        "navigationBarTitleText": "账单"
+      }
+    },
+    {
+      "path": "pages/user/login/index",
+      "type": "page",
+      "layout": "default",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "登录"
       }
     }
   ],

@@ -10,7 +10,8 @@ interface NavigateToOptions {
        "/pages/report/index" |
        "/pages/setting/index" |
        "/pages/user/index" |
-       "/pages/bill/edit/index";
+       "/pages/bill/edit/index" |
+       "/pages/user/login/index";
 }
 interface RedirectToOptions extends NavigateToOptions {}
 

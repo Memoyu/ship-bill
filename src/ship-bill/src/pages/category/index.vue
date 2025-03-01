@@ -1,6 +1,7 @@
 <route lang="json5" type="page">
 {
   layout: 'default',
+  needLogin: true,
   style: {
     navigationStyle: 'custom',
     navigationBarTitleText: '分类管理',

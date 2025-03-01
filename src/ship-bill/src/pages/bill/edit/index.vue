@@ -1,9 +1,10 @@
 <route lang="json5" type="page">
 {
   layout: 'default',
+  needLogin: true,
   style: {
     navigationStyle: 'custom',
-    navigationBarTitleText: '用户',
+    navigationBarTitleText: '账单',
   },
 }
 </route>

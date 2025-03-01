@@ -1,6 +1,7 @@
 <route lang="json5" type="page">
 {
   layout: 'default',
+  needLogin: true,
   style: {
     navigationStyle: 'custom',
     navigationBarTitleText: '图表',
@@ -151,11 +152,11 @@ const value = ref<any[]>([dayjs().subtract(1, 'day').toDate(), Date.now()])
 
 onLoad(() => {})
 
-function handleClickLeft() {
+const handleClickLeft = () => {
   uni.navigateBack()
 }
 
-function handleConfirm({ value }) {
+const handleConfirm = ({ value }) => {
   console.log(new Date(value))
 }
 

@@ -6,6 +6,7 @@ const getCategories = require('./categories/list/index');
 const createUser = require('./user/create/index');
 const updateUser = require('./user/update/index');
 const getOpenId = require('./user/openid/index');
+const getUser = require('./user/get/index');
 
 cloud.init({
   env: cloud.DYNAMIC_CURRENT_ENV
@@ -19,6 +20,8 @@ const mapUser = async (event, context) => {
       return await updateUser.main(event, context);
     case 'openid':
       return await getOpenId.main(event, context);
+    case 'get':
+      return await getUser.main(event, context);
   }
 }
 

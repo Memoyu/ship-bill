@@ -6,13 +6,18 @@ cloud.init({
 const db = cloud.database();
 
 exports.main = async (event, context) => {
+  const _ = db.command
   try {
     let userid = event.data;
-    if (!userid) throw new Error("用户id不能为空");
+    if (!userid) throw new Error("用户id/openid不能为空");
 
-    let users = await usersCol.where({
-      _id: userid
-    }).get();
+    let users = await db.collection('users').where(
+      _.or([{
+        _id: userid
+      }, {
+        openid: userid
+      }])
+    ).get();
     if (users.data && users.data.length > 0) {
       return users.data[0];
     } else {

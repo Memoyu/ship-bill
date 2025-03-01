@@ -1,6 +1,7 @@
 <route lang="json5" type="page">
 {
   layout: 'default',
+  needLogin: true,
   style: {
     navigationStyle: 'custom',
     navigationBarTitleText: '用户',
@@ -55,7 +56,7 @@
             no-border
             size="large"
             type="text"
-            v-model="user.license_plate"
+            v-model="user.licensePlate"
             placeholder="请输入车牌"
           />
         </wd-cell-group>
@@ -79,12 +80,12 @@ const user = {
   company: '',
   name: '',
   phone: '',
-  license_plate: '',
+  licensePlate: '',
 }
 
 onLoad(() => {})
 
-function handleClickLeft() {
+const handleClickLeft = () => {
   uni.navigateBack()
 }
 </script>

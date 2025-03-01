@@ -1,6 +1,7 @@
 <route lang="json5" type="page">
 {
   layout: 'default',
+  needLogin: true,
   style: {
     navigationStyle: 'custom',
     navigationBarTitleText: '报表',
@@ -216,7 +217,7 @@ onLoad(() => {
   console.log(windowHeight, safeAreaInsets, tableHeight.value)
 })
 
-function handleClickLeft() {
+const handleClickLeft = () => {
   uni.navigateBack()
 }
 </script>
