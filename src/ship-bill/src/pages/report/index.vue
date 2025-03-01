@@ -37,7 +37,7 @@
     </view>
     <view class="w-full absolute bottom-3">
       <view class="mx-6">
-        <wd-button block>导出数据</wd-button>
+        <wd-button block size="large">导出数据</wd-button>
       </view>
     </view>
   </view>
@@ -218,7 +218,11 @@ onLoad(() => {
 })
 
 const handleClickLeft = () => {
-  uni.navigateBack()
+  uni.navigateBack({
+    fail: () => {
+      uni.navigateTo({ url: '/pages/index/index' })
+    },
+  })
 }
 </script>
 

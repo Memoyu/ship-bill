@@ -153,7 +153,11 @@ const value = ref<any[]>([dayjs().subtract(1, 'day').toDate(), Date.now()])
 onLoad(() => {})
 
 const handleClickLeft = () => {
-  uni.navigateBack()
+  uni.navigateBack({
+    fail: () => {
+      uni.navigateTo({ url: '/pages/index/index' })
+    },
+  })
 }
 
 const handleConfirm = ({ value }) => {

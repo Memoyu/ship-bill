@@ -35,7 +35,7 @@
     </view>
     <view class="w-full absolute bottom-8">
       <view class="mx-6">
-        <wd-button block :loading="saveLoading">保存</wd-button>
+        <wd-button block size="large" :loading="saveLoading">保存</wd-button>
       </view>
     </view>
   </view>
@@ -53,7 +53,11 @@ const saveLoading = ref<boolean>(false)
 onLoad(() => {})
 
 const handleClickLeft = () => {
-  uni.navigateBack()
+  uni.navigateBack({
+    fail: () => {
+      uni.navigateTo({ url: '/pages/index/index' })
+    },
+  })
 }
 </script>
 

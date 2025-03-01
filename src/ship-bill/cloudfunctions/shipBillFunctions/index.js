@@ -1,6 +1,5 @@
 // 云函数入口文件
 const cloud = require('wx-server-sdk')
-const wxctx = require('./wx-context');
 
 const getCategories = require('./categories/list/index');
 const createUser = require('./user/create/index');
@@ -40,12 +39,28 @@ const mapBill = async (event, context) => {
 }
 // 云函数入口函数
 exports.main = async (event, context) => {
-  switch (event.type) {
-    case 'USER':
-      return await mapUser(event, context);
-    case 'CATEGORY':
-      return await mapCategory(event, context);
-    case 'BILL':
-      return await mapBill(event, context);
+  try {
+    let data;
+    switch (event.type) {
+      case 'USER':
+        data = await mapUser(event, context);
+        break;
+      case 'CATEGORY':
+        data = await mapCategory(event, context);
+        break;
+      case 'BILL':
+        data = await mapBill(event, context);
+        break;
+    }
+
+    return {
+      data,
+      success: true
+    };
+  } catch (e) {
+    return {
+      success: false,
+      errMsg: e.message
+    };
   }
 }

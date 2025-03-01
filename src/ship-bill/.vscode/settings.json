@@ -61,5 +61,8 @@
   "git.ignoreLimitWarning": true,
   "[wxml]": {
     "editor.defaultFormatter": "wechat.miniprogram.wxml-language-features"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "HookyQR.beautify"
   }
 }

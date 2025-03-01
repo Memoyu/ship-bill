@@ -7,28 +7,21 @@ cloud.init({
 const db = cloud.database();
 
 exports.main = async (event, context) => {
-  try {
-    let data = event.data;
-    if (!data) throw new Error("用户数据不能为空");
-    let usersCol = db.collection('users');
-    let openid = wxctx.getOpenId();
-    if (!openid) throw new Error("用户openid获取失败");
+  let data = event.data;
+  if (!data) throw new Error("用户数据不能为空");
+  let usersCol = db.collection('users');
+  let openid = wxctx.getOpenId();
+  if (!openid) throw new Error("用户openid获取失败");
 
-    let users = await usersCol.where({
-      openid: openid
-    }).get();
-    if (users.data && users.data.length > 0) return users.data[0];
+  let users = await usersCol.where({
+    openid: openid
+  }).get();
+  if (users.data && users.data.length > 0) return users.data[0];
 
-    let res = await usersCol.add({
-      data
-    });
-    data._id = res._id;
+  let res = await usersCol.add({
+    data
+  });
+  data._id = res._id;
 
-    return data;
-  } catch (e) {
-    return {
-      success: false,
-      errMsg: e.message
-    };
-  }
+  return data;
 };

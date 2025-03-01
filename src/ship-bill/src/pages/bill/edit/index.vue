@@ -78,22 +78,22 @@
             placeholder="装货地址, 例如: 广州江高+南海水里"
           />
           <wd-input
-            label="柜号"
+            label="柜号1"
             label-width="50px"
             no-border
             size="large"
             type="text"
             v-model="bill.counter"
-            placeholder="柜号, 例如: AKKU1234567"
+            placeholder="例如: AKKU1234567"
           />
           <wd-input
-            label="子柜号"
+            label="柜号2"
             label-width="50px"
             no-border
             size="large"
             type="text"
             v-model="bill.sub_counter"
-            placeholder="子柜号, 例如: 1234567"
+            placeholder="例如: 1234567"
           />
           <wd-input
             label="备注"
@@ -116,7 +116,9 @@
     </view>
     <view class="w-full absolute bottom-8">
       <view class="mx-6">
-        <wd-button block custom-class="custom-shadow" :loading="saveLoading">保存</wd-button>
+        <wd-button block size="large" custom-class="custom-shadow" :loading="saveLoading">
+          保存
+        </wd-button>
       </view>
     </view>
   </view>
@@ -154,7 +156,11 @@ const currentCategory = ref<any>()
 onLoad(() => {})
 
 const handleClickLeft = () => {
-  uni.navigateBack()
+  uni.navigateBack({
+    fail: () => {
+      uni.navigateTo({ url: '/pages/index/index' })
+    },
+  })
 }
 
 const handleClickAddCategory = () => {

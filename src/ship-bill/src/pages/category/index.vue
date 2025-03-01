@@ -67,7 +67,11 @@ const categories = ref<any[]>(expends)
 onLoad(() => {})
 
 const handleClickLeft = () => {
-  uni.navigateBack()
+  uni.navigateBack({
+    fail: () => {
+      uni.navigateTo({ url: '/pages/index/index' })
+    },
+  })
 }
 
 const handleChangeType = ({ value }) => {

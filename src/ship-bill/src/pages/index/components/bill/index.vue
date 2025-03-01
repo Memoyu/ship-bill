@@ -1,5 +1,9 @@
 <template>
-  <wd-floating-panel v-model:height="height" :anchors="anchors">
+  <wd-floating-panel
+    v-model:height="panelHeight"
+    :anchors="anchors"
+    @height-change="handleHeightChangePanel"
+  >
     <view class="z-50 sticky top-0 bg-white px-5 py-4">
       <view class="flex justify-between items-center">
         <view class="font-bold">当前账单</view>
@@ -91,11 +95,14 @@ const data = [
     remark: '测试备注3',
   },
 ]
-const props = defineProps<{ date: string }>()
-
+const props = defineProps<{ show: boolean; date: string }>()
+const emits = defineEmits<{
+  (e: 'update:show', value: boolean): void
+}>()
 const types = ref(['全部', '支出', '收入'])
 const type = ref('全部')
-const height = ref<number>(80)
+const minHeight = 80
+const panelHeight = ref<number>(minHeight)
 const { windowHeight } = uni.getSystemInfoSync()
 const maxHeight = ref<number>(0)
 const anchors = ref<number[]>([])
@@ -105,9 +112,16 @@ watch(
   () => props.date,
   (nweDate) => {
     currentDate.value = nweDate
-    height.value = maxHeight.value
   },
 )
+
+watch(
+  () => props.show,
+  (nweShow) => {
+    nweShow && (panelHeight.value = maxHeight.value)
+  },
+)
+
 onLoad(() => {
   maxHeight.value = Math.round(0.6 * windowHeight)
   anchors.value = [80, maxHeight.value]
@@ -115,5 +129,9 @@ onLoad(() => {
 
 const handleChangeType = () => {
   console.log(type.value)
+}
+
+const handleHeightChangePanel = ({ height }) => {
+  height === minHeight && emits('update:show', false)
 }
 </script>

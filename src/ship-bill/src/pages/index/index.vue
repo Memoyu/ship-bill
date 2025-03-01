@@ -17,7 +17,7 @@
       <!-- 这是底部撑起来的 -->
       <view style="height: 90px" />
 
-      <BillPanel :date="summaryDate" />
+      <BillPanel :date="summaryDate" v-model:show="billShow" />
       <wd-fab
         :expandable="false"
         type="primary"
@@ -42,6 +42,7 @@ defineOptions({
 })
 
 const summaryDate = ref('')
+const billShow = ref(false)
 
 onLoad(() => {})
 
@@ -52,8 +53,8 @@ const handleClickAddBill = () => {
 }
 
 const handleClickSummary = (date: string) => {
-  console.log(date)
   summaryDate.value = date
+  billShow.value = true
 }
 </script>
 

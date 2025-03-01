@@ -7,6 +7,12 @@ export type CallFunctionOptions = {
   hideErrorToast?: boolean
 }
 
+export type CallFunctionResult<T> = {
+  errMsg: string
+  success: boolean
+  data: T
+}
+
 const http = <T>(options: CallFunctionOptions) => {
   return new Promise<T>((resolve, reject) => {
     wx.cloud.callFunction({
@@ -17,17 +23,22 @@ const http = <T>(options: CallFunctionOptions) => {
         data: options.data,
       },
       success: function (res) {
-        // console.log(res)
+        console.log(res)
+        let errMsg = res.errMsg
         if (res.errMsg === 'cloud.callFunction:ok') {
-          resolve(res.result as T)
-        } else {
-          !options.hideErrorToast &&
-            uni.showToast({
-              icon: 'none',
-              title: res.errMsg || '请求错误',
-            })
-          reject(res)
+          const result = res.result as CallFunctionResult<T>
+          if (result.success) {
+            return resolve(result.data)
+          }
+          errMsg = result.errMsg
         }
+
+        !options.hideErrorToast &&
+          uni.showToast({
+            icon: 'none',
+            title: errMsg || '请求错误',
+          })
+        reject(res)
       },
       fail: (err) => {
         uni.showToast({
