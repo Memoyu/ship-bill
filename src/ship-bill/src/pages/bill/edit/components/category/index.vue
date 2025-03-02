@@ -1,22 +1,32 @@
 <template>
   <wd-popup
-    v-model="modelValue"
+    v-model="showPopup"
     custom-style="border-radius:25rpx;height: 60%;width: 95%;"
     @close="handleClosePopup"
   >
     <view class="pt-3 sticky top-0 bg-white">
       <view class="flex justify-center">
-        <wd-text color="#000" :text="selected.name" size="40rpx" bold />
+        <wd-text color="#000" :text="current.name" size="40rpx" bold />
       </view>
       <view v-if="showUnitPrice" class="flex">
-        <wd-input label="油量" placeholder="加油量, 升" type="number" v-model="amount.total" />
-        <wd-input label="油价" placeholder="油价, 元" type="number" v-model="amount.unitPrice" />
+        <wd-input
+          :label="totalLable"
+          :placeholder="totalPlace"
+          type="number"
+          v-model="amount.total"
+        />
+        <wd-input
+          :label="unitPriceLable"
+          :placeholder="unitPricePlace"
+          type="number"
+          v-model="amount.unitPrice"
+        />
       </view>
 
       <view v-else class="flex">
         <wd-input
-          :label="typeName + '总额'"
-          :placeholder="typeName + '总额, 元'"
+          :label="totalLable"
+          :placeholder="totalPlace"
           type="number"
           v-model="amount.total"
         />
@@ -36,7 +46,7 @@
               'justify-between',
               'items-center',
               'rounded-md',
-              selected._id === item._id ? 'selected-item' : '',
+              current._id === item._id ? 'current-item' : '',
             ]"
             @click="() => handleClickCategoryItem(item)"
           >
@@ -60,7 +70,15 @@ const emits = defineEmits<{
   (e: 'confirm', value: any): void
 }>()
 
-const categories = [
+const showPopup = ref(false)
+watch(
+  () => props.modelValue,
+  (nweShow) => {
+    showPopup.value = nweShow
+  },
+)
+
+const categories = ref([
   { _id: '111111', name: '磅费', base: true },
   { _id: '222222', name: '超时费', base: true },
   { _id: '2222221', name: '加油', base: true },
@@ -86,39 +104,64 @@ const categories = [
   { _id: '77777777', name: '自定义来', base: false },
   { _id: '877778', name: '自定义来', base: false },
   { _id: '977779', name: '自定义来', base: false },
-]
-
-const selected = ref<any>({})
-const amount = ref({ total: '', unitPrice: '' })
+])
 const typeName = computed(() => {
+  // console.log('账单类型变更', props.type)
   return props.type === 1 ? '支出' : '收入'
 })
-const showUnitPrice = computed(() => {
-  return selected.value.name === '加油'
-})
 
-// watch(
-//   () => props.modelValue,
-//   (nweValue) => {
-//     if (nweValue) {
-//       initCurrentData()
-//     }
-//   },
-// )
+const current = ref<any>({})
+const amount = ref({ total: '', unitPrice: '' })
+
+const showUnitPrice = ref(false)
+const totalLable = ref('')
+const totalPlace = ref('')
+const unitPriceLable = ref('')
+const unitPricePlace = ref('')
+
+const incomeCategories = ref<any[]>([])
+const expendCategories = ref<any[]>([])
+
+watch(
+  () => [props.type, current.value.name],
+  ([newType, newSelectName]) => {
+    if (newType === 2) {
+      showUnitPrice.value = true
+      totalLable.value = '产值'
+      totalPlace.value = '产值总额, 元'
+      unitPriceLable.value = '提成'
+      unitPricePlace.value = '提成点数, %'
+      return
+    }
+
+    if (newSelectName === '加油') {
+      showUnitPrice.value = true
+      totalLable.value = '油量'
+      totalPlace.value = '加油量, 升'
+      unitPriceLable.value = '油价'
+      unitPricePlace.value = '油价, 元'
+      return
+    }
+
+    showUnitPrice.value = false
+    totalLable.value = '总额'
+    totalPlace.value = '总额, 元'
+  },
+)
 
 watch(
   () => props.category,
   (nweCategory) => {
     initCurrentData(nweCategory)
     if (nweCategory) {
-      selected.value = nweCategory
+      current.value = nweCategory
       amount.value = { total: nweCategory.total, unitPrice: nweCategory.unitPrice }
     }
   },
 )
 
 onLoad(() => {
-  selected.value = categories[0]
+  current.value = categories.value[0]
 })
 
 const handleClosePopup = () => {
@@ -126,7 +169,7 @@ const handleClosePopup = () => {
 }
 
 const handleClickConfirm = () => {
-  if (selected.value._id === '' || selected.value._id.length === 0) {
+  if (current.value._id === '' || current.value._id.length === 0) {
     uni.showToast({
       title: '请选择分类',
       icon: 'none',
@@ -139,7 +182,7 @@ const handleClickConfirm = () => {
 
   if (isNaN(total) || total === 0) {
     uni.showToast({
-      title: showUnitPrice.value ? '请输入油量' : '请输入总额',
+      title: '请输入' + totalLable.value,
       icon: 'none',
     })
     return
@@ -147,30 +190,30 @@ const handleClickConfirm = () => {
 
   if (showUnitPrice.value && (isNaN(unitPrice) || unitPrice === 0)) {
     uni.showToast({
-      title: '请输入油价',
+      title: '请输入' + unitPriceLable.value,
       icon: 'none',
     })
     return
   }
 
   emits('update:modelValue', false)
-  emits('confirm', { ...selected.value, total, unitPrice })
+  emits('confirm', { ...current.value, total, unitPrice })
 }
 
 const handleClickCategoryItem = (item: any) => {
-  selected.value = item
+  current.value = item
 }
 
 const initCurrentData = (category: any) => {
   // TODO: 加载分类数据
 
-  if (!category) selected.value = categories.length > 1 ? categories[0] : {}
+  if (!category) current.value = categories.value.length > 1 ? categories.value[0] : {}
   amount.value = { total: '', unitPrice: '' }
 }
 </script>
 
-<style lang="scss">
-.selected-item {
+<style lang="scss" scoped>
+.current-item {
   @apply bg-slate-400;
 }
 </style>

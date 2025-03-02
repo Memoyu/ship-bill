@@ -76,8 +76,8 @@ import {
   createUser,
   updateUser,
   getUser,
-  IUser,
-  ICreateUser,
+  User,
+  CreateUser,
   uploadAvatar,
 } from '@/service'
 import { useMessage } from 'wot-design-uni'
@@ -93,22 +93,23 @@ const userStore = useUserStore()
 
 const loginLoading = ref<boolean>(false)
 const openid = ref<string>('')
-const user = ref<IUser>()
-const newUser = ref<ICreateUser>({} as ICreateUser)
+const user = ref<User>()
+const newUser = ref<CreateUser>({ name: '', avatar: '', phone: '', company: '', licensePlate: '' })
 
 onLoad(() => {
   getOpenId()
     .then((res) => {
       // console.log(res)
       openid.value = res.openid
-      getUser(res.openid).then((res) => {
+      getUser(res.openid, true).then((res) => {
         // console.log(res)
         if (res && res._id && res._id.length > 0) {
           newUser.value = {
             company: res.company,
             name: res.name,
             avatar: res.avatar,
-            openid: res.openid,
+            phone: res.phone,
+            licensePlate: res.licensePlate,
           }
           user.value = res
         }
@@ -134,7 +135,7 @@ const handleChooseAvatar = (e: any) => {
   uploadAvatar(openid.value, avatarUrl)
     .then((res) => {
       newUser.value.avatar = res
-      console.log('新头像', newUser.value)
+      // console.log('新头像', newUser.value)
       wx.showToast({
         icon: 'success',
         title: '上传成功',
@@ -153,6 +154,7 @@ const handleClickLeft = () => {
 }
 
 const handleClickLogin = () => {
+  console.log('当前登录用户', newUser)
   loginLoading.value = true
   if (user.value) {
     // 更新用户
@@ -161,6 +163,8 @@ const handleClickLogin = () => {
       name: newUser.value.name,
       avatar: newUser.value.avatar,
       company: newUser.value.company,
+      phone: user.value.phone,
+      licensePlate: user.value.licensePlate,
     })
       .then((res) => {
         // console.log('更新', res)
@@ -185,7 +189,7 @@ const handleClickLogin = () => {
   }
 }
 
-const loginSuccess = (user: IUser) => {
+const loginSuccess = (user: User) => {
   // 缓存用户
   userStore.setUser(user)
 

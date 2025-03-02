@@ -1,1 +1,0 @@
-"C:\Program Files (x86)\Tencent\微信web开发者工具\cli.bat" cloud functions deploy --e bills-2gicckj4da64cdc4 --n quickstartFunctions --r --project "D:\WorkSpace\1-Project\ShipBill" --report_first --report

@@ -1,0 +1,168 @@
+{
+  "type": 1,
+  "name": "尿素",
+  "base": true,
+  "openid": ""
+}
+{
+  "type": 1,
+  "name": "停车费",
+  "base": true,
+  "openid": ""
+}
+{
+  "type": 1,
+  "name": "换柜费",
+  "base": true,
+  "openid": ""
+}
+{
+  "type": 1,
+  "name": "高速费",
+  "base": true,
+  "openid": ""
+}
+{
+  "type": 1,
+  "name": "验还柜",
+  "base": true,
+  "openid": ""
+}
+{
+  "type": 1,
+  "name": "修柜费",
+  "base": true,
+  "openid": ""
+}
+{
+  "type": 1,
+  "name": "补胎",
+  "base": true,
+  "openid": ""
+}
+{
+  "type": 1,
+  "name": "吊柜费",
+  "base": true,
+  "openid": ""
+}
+{
+  "type": 1,
+  "name": "打单费",
+  "base": true,
+  "openid": ""
+}
+{
+  "type": 1,
+  "name": "提柜费",
+  "base": true,
+  "openid": ""
+}
+{
+  "type": 1,
+  "name": "洗柜费",
+  "base": true,
+  "openid": ""
+}
+{
+  "type": 1,
+  "name": "封条费",
+  "base": true,
+  "openid": ""
+}
+{
+  "type": 1,
+  "name": "薰柜费",
+  "base": true,
+  "openid": ""
+}
+{
+  "type": 1,
+  "name": "修车费",
+  "base": true,
+  "openid": ""
+}
+{
+  "type": 1,
+  "name": "加油",
+  "base": true,
+  "openid": ""
+}
+{
+  "type": 2,
+  "name": "磅费",
+  "base": true,
+  "openid": ""
+}
+{
+  "type": 2,
+  "name": "超时费",
+  "base": true,
+  "openid": ""
+}
+{
+  "type": 2,
+  "name": "提空",
+  "base": true,
+  "openid": ""
+}
+{
+  "type": 2,
+  "name": "封柜费",
+  "base": true,
+  "openid": ""
+}
+{
+  "type": 2,
+  "name": "补贴",
+  "base": true,
+  "openid": ""
+}
+{
+  "type": 2,
+  "name": "提重",
+  "base": true,
+  "openid": ""
+}
+{
+  "type": 2,
+  "name": "加班",
+  "base": true,
+  "openid": ""
+}
+{
+  "type": 2,
+  "name": "压夜",
+  "base": true,
+  "openid": ""
+}
+{
+  "type": 2,
+  "name": "还空",
+  "base": true,
+  "openid": ""
+}
+{
+  "type": 2,
+  "name": "异提费",
+  "base": true,
+  "openid": ""
+}
+{
+  "type": 2,
+  "name": "超重费",
+  "base": true,
+  "openid": ""
+}
+{
+  "type": 2,
+  "name": "还重",
+  "base": true,
+  "openid": ""
+}
+{
+  "type": 2,
+  "name": "渡柜",
+  "base": true,
+  "openid": ""
+}

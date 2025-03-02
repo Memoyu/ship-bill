@@ -66,8 +66,9 @@
         </view>
       </view>
 
-      <view>
+      <view class="mt-3">
         <wd-cell-group>
+          <wd-datetime-picker label="日期" size="large" type="date" v-model="bill.date" />
           <wd-input
             label="地址"
             label-width="50px"
@@ -125,23 +126,23 @@
 </template>
 
 <script lang="ts" setup>
+import dayjs from 'dayjs'
 import CategoryPopup from './components/category/index.vue'
 
 defineOptions({
   name: 'EditBill',
 })
 
-const bill = {
+const bill = ref({
   type: 1,
   amount: 0,
   address: '',
   counter: '',
   sub_counter: '',
   remark: '',
-  date: '',
-  category: '',
-  categoryId: '',
-}
+  date: Date.now(),
+  categorys: [],
+})
 
 const pickCategoryShow = ref<boolean>(false)
 const types = ref(['支出', '收入'])
@@ -173,9 +174,10 @@ const handleConfirmAddCategory = (category: any) => {
   categories.value.push(category)
 }
 
-const handleChangeType = (value: string) => {
+const handleChangeType = ({ value }) => {
   // 支出: 1, 收入: 2
-  bill.type = value === '支出' ? 1 : 2
+  bill.value.type = value === '支出' ? 1 : 2
+  // console.log('账单类型切换', bill.value.type, value)
 }
 
 const handleClickCategoryItem = (category: any) => {

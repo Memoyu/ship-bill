@@ -89,7 +89,7 @@
 </template>
 
 <script lang="ts" setup>
-import { updateUser, getUser, IUser, IUpdateUser, uploadAvatar } from '@/service'
+import { updateUser, getUser, User, UpdateUser, uploadAvatar } from '@/service'
 import { useUserStore } from '@/store'
 import defaultAvatar from '@/static/avatar.png'
 
@@ -101,7 +101,7 @@ const { userState, setUser } = useUserStore()
 
 const saveLoading = ref<boolean>(false)
 const loaded = ref<boolean>(false)
-const user = ref<IUser>()
+const user = ref<User>({} as User)
 
 onLoad(() => {
   const openid = userState.openid
@@ -148,6 +148,8 @@ const handleClickSave = () => {
     name: user.value.name,
     avatar: user.value.avatar,
     company: user.value.company,
+    phone: user.value.phone,
+    licensePlate: user.value.licensePlate,
   })
     .then((res) => {
       console.log('更新成功', res)

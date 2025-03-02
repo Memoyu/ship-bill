@@ -8,20 +8,25 @@ const db = cloud.database();
 
 exports.main = async (event, context) => {
   let data = event.data;
-  if (!data) throw new Error("用户数据不能为空");
-  let usersCol = db.collection('users');
+  if (!data) throw new Error("分类数据不能为空");
   let openid = wxctx.getOpenId();
   if (!openid) throw new Error("用户openid获取失败");
 
-  let users = await usersCol.where({
-    openid: openid
+  if (!data.name || data.name.length < 1) throw new Error("分类名称不能为空");
+
+  let categoryCol = db.collection('categories');
+  let categories = await categoryCol.where({
+    openid: openid,
+    name: data.name
   }).get();
-  if (users.data && users.data.length > 0) return users.data[0];
+
+  if (categories.data && categories.data.length > 0) throw new Error("同名分类已存在");
 
   data.openid = openid;
+  data.base = false;
   data.updateTime = Date.now();
   data.createTime = Date.now();
-  let res = await usersCol.add({
+  let res = await categoryCol.add({
     data
   });
   data._id = res._id;

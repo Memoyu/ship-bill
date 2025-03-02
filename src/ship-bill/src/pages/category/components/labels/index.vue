@@ -1,7 +1,7 @@
 <template>
   <view class="mt3">
     <view class="grid grid-cols-3 gap-2">
-      <view v-for="label in labels" :key="label._id">
+      <view v-for="label in filterCategories" :key="label._id">
         <view class="py-1 px-2 h-8 bg-slate-100 flex justify-between items-center rounded-md">
           <wd-text color="#000" :text="label.name" :lines="1" size="35rpx"></wd-text>
           <wd-icon v-if="!label.base" name="close-outline" size="40rpx" />
@@ -41,10 +41,20 @@
 </template>
 
 <script lang="ts" setup>
-defineProps<{ type: number; labels?: any[] }>()
+import { Category, createCategory } from '@/service'
 
+const props = defineProps<{ type: number; categories: Category[] }>()
+const emits = defineEmits<{
+  (e: 'update:categories', values: Category[]): void
+}>()
 const show = ref<boolean>(false)
 const labelName = ref<string>('')
+
+const filterCategories = computed(() => {
+  // console.log('账单类型变更', props.type)
+  return props.categories.filter((c) => c.type === props.type)
+})
+
 const handleClickAddLabel = () => {
   show.value = true
 }
@@ -59,6 +69,23 @@ const handleClickSaveLabel = () => {
       title: '分类名称不能为空',
       icon: 'none',
     })
+    return
   }
+  uni.showLoading({
+    title: '保存中',
+  })
+
+  createCategory({ type: props.type, name: labelName.value })
+    .then((res) => {
+      const categories = [...props.categories]
+      categories.push(res)
+      emits('update:categories', categories)
+      show.value = false
+      uni.hideLoading()
+    })
+    .catch((e) => {
+      uni.hideLoading()
+      console.log(e)
+    })
 }
 </script>

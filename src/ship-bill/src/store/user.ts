@@ -1,4 +1,4 @@
-import { IUser } from '@/service'
+import { User } from '@/service'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
@@ -9,7 +9,7 @@ export const useUserStore = defineStore(
   () => {
     const userState = ref<IUserInfo>({ ...initState })
 
-    const setUser = (user: IUser) => {
+    const setUser = (user: User) => {
       userState.value.openid = user.openid
       userState.value.avatar = user.avatar
       userState.value.name = user.name

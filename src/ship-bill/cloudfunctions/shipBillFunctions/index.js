@@ -1,11 +1,14 @@
 // 云函数入口文件
 const cloud = require('wx-server-sdk')
 
-const getCategories = require('./categories/list/index');
 const createUser = require('./user/create/index');
 const updateUser = require('./user/update/index');
 const getOpenId = require('./user/openid/index');
 const getUser = require('./user/get/index');
+
+const getCategories = require('./categories/list/index');
+const createCategory = require('./categories/create/index');
+const updateCategory = require('./categories/update/index');
 
 cloud.init({
   env: cloud.DYNAMIC_CURRENT_ENV
@@ -21,6 +24,8 @@ const mapUser = async (event, context) => {
       return await getOpenId.main(event, context);
     case 'get':
       return await getUser.main(event, context);
+    default:
+      throw new Error("未定义method");
   }
 }
 
@@ -28,6 +33,12 @@ const mapCategory = async (event, context) => {
   switch (event.method) {
     case 'list':
       return await getCategories.main(event, context);
+    case 'create':
+      return await createCategory.main(event, context);
+    case 'update':
+      return await updateCategory.main(event, context);
+    default:
+      throw new Error("未定义method");
   }
 }
 
@@ -51,6 +62,8 @@ exports.main = async (event, context) => {
       case 'BILL':
         data = await mapBill(event, context);
         break;
+      default:
+        throw new Error("未定义type");
     }
 
     return {

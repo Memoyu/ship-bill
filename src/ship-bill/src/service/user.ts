@@ -1,40 +1,44 @@
 import request from '@/utils/request'
+const type = 'USER'
 
-export interface IWxContent {
+export type WxContent = {
   appid: string
   openid: string
-  unionid: string
+  unionid?: string
 }
 
-export interface IUser {
+export type User = {
   _id: string
   openid: string
   name: string
   avatar: string
-  company: string
   phone: string
+  company: string
+  licensePlate: string
+  updateTime: number
+  createTime: number
+}
+
+export type CreateUser = {
+  name: string
+  avatar: string
+  phone: string
+  company: string
   licensePlate: string
 }
 
-export interface ICreateUser {
-  openid: string
-  company: string
-  name: string
-  avatar: string
-}
-
-export interface IUpdateUser {
+export type UpdateUser = {
   _id: string
-  company: string
   name: string
   avatar: string
-  phone?: string
-  licensePlate?: string
+  phone: string
+  company: string
+  licensePlate: string
 }
 
 export async function getOpenId() {
-  return request<IWxContent>({
-    type: 'USER',
+  return request<WxContent>({
+    type,
     method: 'openid',
     hideErrorToast: false,
   })
@@ -45,25 +49,26 @@ export async function getOpenId() {
  * @param id openid 或 _id
  * @returns
  */
-export async function getUser(id: string) {
-  return request<IUser>({
-    type: 'USER',
+export async function getUser(id: string, hideErrorToast: boolean = false) {
+  return request<User>({
+    type,
     method: 'get',
     data: id,
+    hideErrorToast,
   })
 }
 
-export async function createUser(user: ICreateUser) {
-  return request<IUser>({
-    type: 'USER',
+export async function createUser(user: CreateUser) {
+  return request<User>({
+    type,
     method: 'create',
     data: user,
   })
 }
 
-export async function updateUser(user: IUpdateUser) {
-  return request<IUser>({
-    type: 'USER',
+export async function updateUser(user: UpdateUser) {
+  return request<User>({
+    type,
     method: 'update',
     data: user,
   })
