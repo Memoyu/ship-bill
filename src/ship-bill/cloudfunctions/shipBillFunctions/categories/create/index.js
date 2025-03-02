@@ -14,11 +14,17 @@ exports.main = async (event, context) => {
 
   if (!data.name || data.name.length < 1) throw new Error("分类名称不能为空");
 
+  const _ = db.command
   let categoryCol = db.collection('categories');
-  let categories = await categoryCol.where({
-    openid: openid,
-    name: data.name
-  }).get();
+  let categories = await categoryCol.where(
+    _.and([{
+      name: data.name
+    }, _.or([{
+      openid: openid
+    }, {
+      base: true
+    }])])
+  ).get();
 
   if (categories.data && categories.data.length > 0) throw new Error("同名分类已存在");
 

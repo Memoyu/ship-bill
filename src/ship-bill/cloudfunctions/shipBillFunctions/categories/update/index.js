@@ -1,4 +1,5 @@
 const cloud = require('wx-server-sdk');
+const wxctx = require('../../wx-context');
 
 cloud.init({
   env: cloud.DYNAMIC_CURRENT_ENV
@@ -11,21 +12,31 @@ exports.main = async (event, context) => {
   if (!data._id) throw new Error("分类id不能为空");
   if (!data.name || data.name.length < 1) throw new Error("分类名称不能为空");
 
+  const id = data._id;
+  const _ = db.command
   let categoryCol = db.collection('categories');
-  let categories = await categoryCol.where({
-    openid: openid,
+
+  let category = (await categoryCol.doc(id).get()).data;
+  if (!category) throw new Error("分类不存在");
+
+  let openid = wxctx.getOpenId();
+
+  let categories = await categoryCol.where(_.and([{
     name: data.name
-  }).get();
+  }, _.or([{
+    openid: openid
+  }, {
+    base: true
+  }])])).get();
 
   if (categories.data && categories.data.length > 0 && categories.data[0]._id !== data._id)
     throw new Error("同名分类已存在");
-  let category = categories.data[0];
 
   delete data._id;
   delete data.openid;
 
   data.updateTime = Date.now();
-  let res = await categoryCol.doc(category._id).add({
+  let res = await categoryCol.doc(id).update({
     data
   });
 

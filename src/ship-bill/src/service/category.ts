@@ -16,6 +16,11 @@ export type CreateCategory = {
   name: string
 }
 
+export type UpdateCategory = {
+  _id: string
+  name: string
+}
+
 export async function getCategories(t: number = 0) {
   return request<Category[]>({
     type,
@@ -29,5 +34,21 @@ export async function createCategory(category: CreateCategory) {
     type,
     method: 'create',
     data: category,
+  })
+}
+
+export async function updateCategory(category: UpdateCategory) {
+  return request<Category>({
+    type,
+    method: 'update',
+    data: category,
+  })
+}
+
+export async function deleteCategory(id: string) {
+  return request<Category>({
+    type,
+    method: 'delete',
+    data: { _id: id },
   })
 }

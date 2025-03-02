@@ -9,6 +9,7 @@ const getUser = require('./user/get/index');
 const getCategories = require('./categories/list/index');
 const createCategory = require('./categories/create/index');
 const updateCategory = require('./categories/update/index');
+const deleteCategory = require('./categories/delete/index');
 
 cloud.init({
   env: cloud.DYNAMIC_CURRENT_ENV
@@ -37,6 +38,8 @@ const mapCategory = async (event, context) => {
       return await createCategory.main(event, context);
     case 'update':
       return await updateCategory.main(event, context);
+    case 'delete':
+      return await deleteCategory.main(event, context);
     default:
       throw new Error("未定义method");
   }
