@@ -35,7 +35,7 @@
 
     <view class="m-3">
       <view class="grid grid-cols-3 gap-2">
-        <view v-for="item in categories" :key="item._id">
+        <view v-for="item in filterCategories" :key="item._id">
           <view
             :class="[
               'py-1',
@@ -64,53 +64,39 @@
 </template>
 
 <script lang="ts" setup>
-const props = defineProps<{ modelValue: boolean; type: number; category?: any }>()
+import { Category, BillCategory, getCategories } from '@/service'
+import { useConfigStore } from '@/store'
+
+const props = defineProps<{
+  modelValue: boolean
+  type: number
+  category?: BillCategory
+}>()
 const emits = defineEmits<{
   (e: 'update:modelValue', value: boolean): void
   (e: 'confirm', value: any): void
 }>()
 
+const { configState } = useConfigStore()
 const showPopup = ref(false)
+const filterCategories = ref<Category[]>([])
+
 watch(
   () => props.modelValue,
   (nweShow) => {
     showPopup.value = nweShow
+
+    initCurrentData(nweShow)
   },
 )
 
-const categories = ref([
-  { _id: '111111', name: '磅费', base: true },
-  { _id: '222222', name: '超时费', base: true },
-  { _id: '2222221', name: '加油', base: true },
-  { _id: '333333', name: '提空', base: true },
-  { _id: '444444', name: '封柜费', base: true },
-  { _id: '555555', name: '补贴', base: false },
-  { _id: '666666', name: '提重', base: false },
-  { _id: '777771', name: '自定义来', base: false },
-  { _id: '777772', name: '自定义来', base: false },
-  { _id: '777773', name: '自定义来', base: false },
-  { _id: '777774', name: '自定义来', base: false },
-  { _id: '777775', name: '自定义来', base: false },
-  { _id: '777776', name: '自定义来', base: false },
-  { _id: '7777777', name: '自定义来', base: false },
-  { _id: '777778', name: '自定义来', base: false },
-  { _id: '777779', name: '自定义来', base: false },
-  { _id: '177771', name: '自定义来', base: false },
-  { _id: '277772', name: '自定义来', base: false },
-  { _id: '377773', name: '自定义来', base: false },
-  { _id: '477774', name: '自定义来', base: false },
-  { _id: '577775', name: '自定义来', base: false },
-  { _id: '677776', name: '自定义来', base: false },
-  { _id: '77777777', name: '自定义来', base: false },
-  { _id: '877778', name: '自定义来', base: false },
-  { _id: '977779', name: '自定义来', base: false },
-])
 const typeName = computed(() => {
   // console.log('账单类型变更', props.type)
   return props.type === 1 ? '支出' : '收入'
 })
 
 const current = ref<any>({})
+const categories = ref<Category[]>([])
 const amount = ref({ total: '', unitPrice: '' })
 
 const showUnitPrice = ref(false)
@@ -118,9 +104,6 @@ const totalLable = ref('')
 const totalPlace = ref('')
 const unitPriceLable = ref('')
 const unitPricePlace = ref('')
-
-const incomeCategories = ref<any[]>([])
-const expendCategories = ref<any[]>([])
 
 watch(
   () => [props.type, current.value.name],
@@ -131,6 +114,7 @@ watch(
       totalPlace.value = '产值总额, 元'
       unitPriceLable.value = '提成'
       unitPricePlace.value = '提成点数, %'
+      amount.value.unitPrice = configState.commission === 0 ? '' : configState.commission.toString()
       return
     }
 
@@ -140,6 +124,7 @@ watch(
       totalPlace.value = '加油量, 升'
       unitPriceLable.value = '油价'
       unitPricePlace.value = '油价, 元'
+      amount.value.unitPrice = configState.oilPrices === 0 ? '' : configState.oilPrices.toString()
       return
     }
 
@@ -149,19 +134,11 @@ watch(
   },
 )
 
-watch(
-  () => props.category,
-  (nweCategory) => {
-    initCurrentData(nweCategory)
-    if (nweCategory) {
-      current.value = nweCategory
-      amount.value = { total: nweCategory.total, unitPrice: nweCategory.unitPrice }
-    }
-  },
-)
-
 onLoad(() => {
-  current.value = categories.value[0]
+  // 获取分类数据
+  getCategories().then((res) => {
+    categories.value = res
+  })
 })
 
 const handleClosePopup = () => {
@@ -204,10 +181,24 @@ const handleClickCategoryItem = (item: any) => {
   current.value = item
 }
 
-const initCurrentData = (category: any) => {
-  // TODO: 加载分类数据
+const initCurrentData = (show) => {
+  if (!show) return
 
-  if (!category) current.value = categories.value.length > 1 ? categories.value[0] : {}
+  filterCategories.value = categories.value.filter((item) => {
+    return item.type === props.type
+  })
+  // console.log('加载数据')
+
+  const inputCategory = props.category
+  if (!inputCategory) {
+    current.value = filterCategories.value.length > 1 ? filterCategories.value[0] : {}
+  } else {
+    current.value = inputCategory
+    amount.value = {
+      total: inputCategory.total.toString(),
+      unitPrice: inputCategory.unitPrice.toString(),
+    }
+  }
   amount.value = { total: '', unitPrice: '' }
 }
 </script>

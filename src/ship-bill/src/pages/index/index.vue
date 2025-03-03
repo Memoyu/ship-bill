@@ -36,15 +36,21 @@ import Summary from './components/summary/index.vue'
 import Report from './components/report/index.vue'
 import Func from './components/func/index.vue'
 import BillPanel from './components/bill/index.vue'
+import { getConfig } from '@/service'
+import { useConfigStore } from '@/store'
 
 defineOptions({
   name: 'Index',
 })
 
+const { setConfig } = useConfigStore()
+
 const summaryDate = ref('')
 const billShow = ref(false)
 
-onLoad(() => {})
+onLoad(() => {
+  loadData()
+})
 
 const handleClickAddBill = () => {
   uni.navigateTo({
@@ -55,6 +61,14 @@ const handleClickAddBill = () => {
 const handleClickSummary = (date: string) => {
   summaryDate.value = date
   billShow.value = true
+}
+
+const loadData = () => {
+  getConfig().then((config) => {
+    if (config._id) {
+      setConfig(config)
+    }
+  })
 }
 </script>
 

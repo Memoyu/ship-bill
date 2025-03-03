@@ -6,8 +6,8 @@
     <view class="func-col-2 col-span-2 bg-indigo-500 relative" @click="handleClickSetting">
       <view class="func-text">设置</view>
       <view class="absolute bottom-1 flex text-base">
-        <view>产值: 90</view>
-        <view class="ml-2">油价: 7.8</view>
+        <view>提成: {{ config.commission }}</view>
+        <view class="ml-2">油价: {{ config.oilPrices }}</view>
       </view>
     </view>
     <view class="func-col-2 bg-indigo-300 func-text">关于我们</view>
@@ -15,6 +15,19 @@
 </template>
 
 <script lang="ts" setup>
+import { useConfigStore } from '@/store'
+
+const { configState } = useConfigStore()
+const config = ref(configState)
+
+watch(
+  () => [configState.commission, configState.oilPrices],
+  ([newCommission, newOilPrices]) => {
+    config.value.commission = newCommission
+    config.value.oilPrices = newOilPrices
+  },
+)
+
 const handleClickSetting = () => {
   uni.navigateTo({
     url: '/pages/setting/index',

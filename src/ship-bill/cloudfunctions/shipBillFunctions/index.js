@@ -11,6 +11,9 @@ const createCategory = require('./categories/create/index');
 const updateCategory = require('./categories/update/index');
 const deleteCategory = require('./categories/delete/index');
 
+const updateConfig = require('./config/update/index');
+const getConfig = require('./config/get/index');
+
 cloud.init({
   env: cloud.DYNAMIC_CURRENT_ENV
 }) // 使用当前云环境
@@ -51,6 +54,18 @@ const mapBill = async (event, context) => {
   //     return await getCategories.main(event, context);
   // }
 }
+
+const mapConfig = async (event, context) => {
+  switch (event.method) {
+    case 'update':
+      return await updateConfig.main(event, context);
+    case 'get':
+      return await getConfig.main(event, context);
+    default:
+      throw new Error("未定义method");
+  }
+}
+
 // 云函数入口函数
 exports.main = async (event, context) => {
   try {
@@ -64,6 +79,9 @@ exports.main = async (event, context) => {
         break;
       case 'BILL':
         data = await mapBill(event, context);
+        break;
+      case 'CONFIG':
+        data = await mapConfig(event, context);
         break;
       default:
         throw new Error("未定义type");

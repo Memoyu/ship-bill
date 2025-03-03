@@ -35,7 +35,7 @@
 
       <view>
         <view class="grid grid-cols-2 gap-2">
-          <view v-for="(category, index) in categories" :key="index">
+          <view v-for="(category, index) in billCategories" :key="index">
             <view
               class="h-12 py-1 px-2 bg-slate-100 flex flex-col justify-between items-center rounded-md"
               @click="() => handleClickCategoryItem(category)"
@@ -128,6 +128,7 @@
 <script lang="ts" setup>
 import dayjs from 'dayjs'
 import CategoryPopup from './components/category/index.vue'
+import { BillCategory } from '@/service'
 
 defineOptions({
   name: 'EditBill',
@@ -148,10 +149,7 @@ const pickCategoryShow = ref<boolean>(false)
 const types = ref(['支出', '收入'])
 const type = ref('支出')
 const saveLoading = ref<boolean>(false)
-const categories = ref<any[]>([
-  { _id: '2222221', name: '加油', total: 7000, unitPrice: 7.8 },
-  { _id: '777771', name: '自定义来', total: 8000, unitPrice: 0 },
-])
+const billCategories = ref<BillCategory[]>([])
 const currentCategory = ref<any>()
 
 onLoad(() => {})
@@ -171,7 +169,7 @@ const handleClickAddCategory = () => {
 
 const handleConfirmAddCategory = (category: any) => {
   console.log(category)
-  categories.value.push(category)
+  billCategories.value.push(category)
 }
 
 const handleChangeType = ({ value }) => {

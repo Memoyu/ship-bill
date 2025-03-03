@@ -1,7 +1,7 @@
 const functionName = 'shipBillFunctions'
 
 export type CallFunctionOptions = {
-  type: 'USER' | 'CATEGORY' | 'BILL'
+  type: 'USER' | 'CATEGORY' | 'BILL' | 'CONFIG'
   method: string
   data?: any
   hideErrorToast?: boolean
