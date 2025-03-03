@@ -38,7 +38,7 @@
           <view v-for="(category, index) in billCategories" :key="index">
             <view
               class="h-12 py-1 px-2 bg-slate-100 flex flex-col justify-between items-center rounded-md"
-              @click="() => handleClickCategoryItem(category)"
+              @click="() => handleClickEditBillCategory(category, index)"
             >
               <wd-text color="#000" :text="category.name" size="35rpx" bold />
               <wd-text
@@ -59,7 +59,7 @@
 
           <view
             class="h-12 border-dashed border-2 border-indigo-600 flex justify-center items-center rounded-md"
-            @click="handleClickAddCategory"
+            @click="handleClickAddBillCategory"
           >
             <wd-icon name="add" size="40rpx" />
           </view>
@@ -111,8 +111,8 @@
       <CategoryPopup
         v-model="pickCategoryShow"
         :type="bill.type"
-        :category="currentCategory"
-        @confirm="handleConfirmAddCategory"
+        :category="inputCategory"
+        @confirm="handleConfirmBillCategory"
       />
     </view>
     <view class="w-full absolute bottom-8">
@@ -129,6 +129,7 @@
 import dayjs from 'dayjs'
 import CategoryPopup from './components/category/index.vue'
 import { BillCategory } from '@/service'
+import { getBillType, isExpendString } from '@/utils/bill'
 
 defineOptions({
   name: 'EditBill',
@@ -150,7 +151,10 @@ const types = ref(['支出', '收入'])
 const type = ref('支出')
 const saveLoading = ref<boolean>(false)
 const billCategories = ref<BillCategory[]>([])
-const currentCategory = ref<any>()
+const expendCategories = ref<BillCategory[]>([])
+const incomeCategories = ref<BillCategory[]>([])
+const inputCategory = ref<BillCategory>()
+const inputCategoryIndex = ref<number>(-1)
 
 onLoad(() => {})
 
@@ -162,34 +166,49 @@ const handleClickLeft = () => {
   })
 }
 
-const handleClickAddCategory = () => {
+const handleClickEditBillCategory = (category: BillCategory, index: number) => {
   pickCategoryShow.value = true
-  currentCategory.value = undefined
+  inputCategory.value = category
+  inputCategoryIndex.value = index
 }
 
-const handleConfirmAddCategory = (category: any) => {
-  console.log(category)
-  billCategories.value.push(category)
+const handleClickAddBillCategory = () => {
+  pickCategoryShow.value = true
+  inputCategory.value = undefined
+  inputCategoryIndex.value = -1
+}
+
+const handleConfirmBillCategory = (category: BillCategory) => {
+  // console.log(category)
+  // 如果是新增
+  if (inputCategoryIndex.value < 0) {
+    billCategories.value.push(category)
+    return
+  }
+  // 编辑
+  billCategories.value[inputCategoryIndex.value] = {
+    ...category,
+  }
 }
 
 const handleChangeType = ({ value }) => {
-  // 支出: 1, 收入: 2
-  bill.value.type = value === '支出' ? 1 : 2
-  // console.log('账单类型切换', bill.value.type, value)
-}
+  const isExpend = isExpendString(value)
 
-const handleClickCategoryItem = (category: any) => {
-  pickCategoryShow.value = true
-  currentCategory.value = category
+  // 支出: 1, 收入: 2
+  bill.value.type = getBillType(value)
+
+  // 备份已有分类，切换分类
+  if (isExpend) {
+    // 收入切换为支出，则备份收入
+    incomeCategories.value = billCategories.value
+  } else {
+    expendCategories.value = billCategories.value
+  }
+  billCategories.value = isExpend ? expendCategories.value : incomeCategories.value
 }
 </script>
 
 <style lang="scss">
 .page-class {
-  :deep() {
-    // .custom-shadow {
-    //   width: 80%;
-    // }
-  }
 }
 </style>
