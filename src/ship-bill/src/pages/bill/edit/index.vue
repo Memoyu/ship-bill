@@ -10,63 +10,69 @@
 </route>
 <template>
   <view>
-    <view class="bg-white pt-2 px-4 page-class">
-      <wd-navbar
-        fixed
-        safeAreaInsetTop
-        placeholder
-        title="账单"
-        left-text="返回"
-        left-arrow
-        @click-left="handleClickLeft"
-        :bordered="false"
-      />
-      <view class="w-50">
-        <wd-segmented
-          :options="types"
-          v-model:value="type"
-          size="middle"
-          @change="handleChangeType"
-        />
-      </view>
-      <view class="my-2 ml-4">
-        <wd-text mode="price" size="35px" :text="bill.amount" bold />
+    <wd-navbar
+      fixed
+      safeAreaInsetTop
+      placeholder
+      title="账单"
+      left-text="返回"
+      left-arrow
+      @click-left="handleClickLeft"
+      :bordered="false"
+    />
+    <view
+      class="px-4 overflow-y-auto"
+      :style="{ height: `calc(100vh - ${safeAreaInsets?.top}px - 64px)` }"
+    >
+      <view class="sticky top-0 bg-white z-[9]">
+        <view class="w-50">
+          <wd-segmented
+            :options="types"
+            v-model:value="type"
+            size="middle"
+            @change="handleChangeType"
+          />
+        </view>
+        <view class="my-2 ml-4">
+          <wd-text
+            mode="price"
+            :color="isExpendString(type) ? '#80CBC4' : '#B82132'"
+            size="35px"
+            :text="bill.amount"
+            bold
+          />
+        </view>
       </view>
 
-      <view>
-        <view class="grid grid-cols-2 gap-2">
-          <view v-for="(category, index) in billCategories" :key="index">
-            <view
-              class="h-12 py-1 px-2 bg-slate-100 flex flex-col justify-between items-center rounded-md"
-              @click="() => handleClickEditBillCategory(category, index)"
-            >
-              <wd-text color="#000" :text="category.name" size="35rpx" bold />
-              <wd-text
-                v-if="category.unitPrice <= 0"
-                mode="price"
-                size="13px"
-                :text="category.total"
-              />
-              <view v-else>
-                <wd-text size="13px" :text="category.total" />
-                <wd-text size="13px" text="×" bold />
-                <wd-text size="13px" :text="category.unitPrice" />
-                <wd-text size="13px" text="=" bold />
-                <wd-text size="13px" mode="price" :text="category.total * category.unitPrice" />
-              </view>
-            </view>
+      <view class="mx-4 mt-5">
+        <view class="flex justify-between">
+          <view class="flex">
+            <text class="inline-block w-12">{{ feeLabel }}:</text>
+            <wd-input
+              v-model="fee"
+              no-border
+              type="number"
+              :placeholder="feePlaceholder"
+              custom-style="display: inline-block; width: 60px; vertical-align: middle;"
+            />
+            <text class="ml-1">{{ feeUnit }}</text>
           </view>
 
-          <view
-            class="h-12 border-dashed border-2 border-indigo-600 flex justify-center items-center rounded-md"
-            @click="handleClickAddBillCategory"
-          >
-            <wd-icon name="add" size="40rpx" />
+          <view class="flex">
+            <text class="inline-block w-12">{{ ratesLabel }}:</text>
+            <wd-input
+              v-model="rates"
+              no-border
+              type="number"
+              :placeholder="ratesPlaceholder"
+              custom-style="display: inline-block; width: 60px; vertical-align: middle;"
+            />
+            <text class="ml-1">{{ ratesUnit }}</text>
           </view>
         </view>
       </view>
 
-      <view class="mt-3">
+      <view class="mt-1">
         <wd-cell-group>
           <wd-datetime-picker label="日期" size="large" type="date" v-model="bill.date" />
           <wd-input
@@ -108,14 +114,42 @@
         </wd-cell-group>
       </view>
 
+      <view class="mt-2">
+        <view class="grid grid-cols-2 gap-2">
+          <view v-for="(category, index) in billCategories" :key="index" class="relative">
+            <view
+              class="h-12 py-1 px-2 bg-slate-100 flex flex-col justify-between items-center rounded-md"
+              @click="() => handleClickEditBillCategory(category, index)"
+            >
+              <wd-text color="#000" :text="category.name" size="35rpx" bold />
+              <wd-text mode="price" size="13px" :text="category.total" />
+            </view>
+            <view
+              class="flex items-center pr-3 absolute right-0 top-0 h-full"
+              @click.stop="() => handleClickDeleteBillCategory(category, index)"
+            >
+              <wd-icon name="close" />
+            </view>
+          </view>
+
+          <view
+            class="h-12 border-dashed border-2 border-indigo-600 flex justify-center items-center rounded-md"
+            @click="handleClickAddBillCategory"
+          >
+            <wd-icon name="add" size="40rpx" />
+          </view>
+        </view>
+      </view>
+
       <CategoryPopup
         v-model="pickCategoryShow"
         :type="bill.type"
         :category="inputCategory"
         @confirm="handleConfirmBillCategory"
       />
+      <view class="h-[128rpx]" />
     </view>
-    <view class="w-full absolute bottom-8">
+    <view class="w-full absolute bottom-5">
       <view class="mx-6">
         <wd-button block size="large" custom-class="custom-shadow" :loading="saveLoading">
           保存
@@ -130,13 +164,18 @@ import dayjs from 'dayjs'
 import CategoryPopup from './components/category/index.vue'
 import { BillCategory } from '@/service'
 import { getBillType, isExpendString } from '@/utils/bill'
+import { useConfigStore } from '@/store'
 
 defineOptions({
   name: 'EditBill',
 })
 
+const { safeAreaInsets } = uni.getSystemInfoSync()
+
 const bill = ref({
   type: 1,
+  fee: 0,
+  rates: 0,
   amount: 0,
   address: '',
   counter: '',
@@ -146,15 +185,55 @@ const bill = ref({
   categorys: [],
 })
 
+const { configState } = useConfigStore()
+
+const feeLabel = ref('加油')
+const feePlaceholder = ref('加油量')
+const feeUnit = ref('升')
+const ratesLabel = ref('油价')
+const ratesPlaceholder = ref('油价')
+const ratesUnit = ref('元')
+
+const oilPrices = configState.oilPrices === 0 ? '' : configState.oilPrices.toString()
+const commission = configState.commission === 0 ? '' : configState.commission.toString()
+const fee = ref('')
+const rates = ref(oilPrices)
+const expendFee = ref('')
+const expendRates = ref(oilPrices)
+const incomeFee = ref('')
+const incomeRates = ref(commission)
+
 const pickCategoryShow = ref<boolean>(false)
 const types = ref(['支出', '收入'])
 const type = ref('支出')
 const saveLoading = ref<boolean>(false)
+
 const billCategories = ref<BillCategory[]>([])
 const expendCategories = ref<BillCategory[]>([])
 const incomeCategories = ref<BillCategory[]>([])
 const inputCategory = ref<BillCategory>()
 const inputCategoryIndex = ref<number>(-1)
+
+watch(
+  () => type.value,
+  (newType) => {
+    if (newType === '支出') {
+      feeLabel.value = '加油'
+      feePlaceholder.value = '总油量'
+      feeUnit.value = '升'
+      ratesLabel.value = '油价'
+      ratesPlaceholder.value = '当前油价'
+      ratesUnit.value = '元'
+    } else {
+      feeLabel.value = '产值'
+      feePlaceholder.value = '总产值'
+      feeUnit.value = '元'
+      ratesLabel.value = '提成'
+      ratesPlaceholder.value = '产值提成'
+      ratesUnit.value = '%'
+    }
+  },
+)
 
 onLoad(() => {})
 
@@ -170,6 +249,12 @@ const handleClickEditBillCategory = (category: BillCategory, index: number) => {
   pickCategoryShow.value = true
   inputCategory.value = category
   inputCategoryIndex.value = index
+}
+
+const handleClickDeleteBillCategory = (category: BillCategory, index: number) => {
+  billCategories.value = billCategories.value.filter((item, i) => {
+    return i !== index
+  })
 }
 
 const handleClickAddBillCategory = () => {
@@ -201,10 +286,16 @@ const handleChangeType = ({ value }) => {
   if (isExpend) {
     // 收入切换为支出，则备份收入
     incomeCategories.value = billCategories.value
+    incomeFee.value = fee.value
+    incomeRates.value = rates.value
   } else {
     expendCategories.value = billCategories.value
+    expendFee.value = fee.value
+    expendRates.value = rates.value
   }
   billCategories.value = isExpend ? expendCategories.value : incomeCategories.value
+  fee.value = isExpend ? expendFee.value : incomeFee.value
+  rates.value = isExpend ? expendRates.value : incomeRates.value
 }
 </script>
 

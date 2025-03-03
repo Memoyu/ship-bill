@@ -33,7 +33,7 @@
         </wd-cell-group>
       </view>
     </view>
-    <view class="w-full absolute bottom-8">
+    <view class="w-full absolute bottom-5">
       <view class="mx-6">
         <wd-button block size="large" :loading="saveLoading" @click="handleClickSave">
           保存

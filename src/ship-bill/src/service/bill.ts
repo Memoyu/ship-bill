@@ -5,7 +5,6 @@ export interface BillCategory {
   categoryId: string
   name: string
   total: number
-  unitPrice: number
 }
 
 export type Bill = {
