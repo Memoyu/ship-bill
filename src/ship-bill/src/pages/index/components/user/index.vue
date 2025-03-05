@@ -20,7 +20,7 @@
 
 <script lang="ts" setup>
 import defaultAvatar from '@/static/avatar.png'
-import { useUserStore } from '@/store/user'
+import { useUserStore } from '@/store'
 
 const user = useUserStore().userState
 

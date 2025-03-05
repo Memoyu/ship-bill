@@ -49,6 +49,25 @@ export type UpdateBill = {
   categorys: BillCategory[]
 }
 
+export type HomeBillStore = {
+  summary: HomeBillSummary
+  reports: HomeBillReport[]
+}
+
+export type HomeBillSummary = {
+  expend: number
+  income: number
+  oilQuantity: number
+  oilCost: number
+  outputValue: number
+}
+
+export type HomeBillReport = {
+  expend: number
+  income: number
+  date: string
+}
+
 export async function getBill(id: string) {
   return request<Bill>({
     type,
@@ -70,5 +89,21 @@ export async function updateBill(bill: UpdateBill) {
     type,
     method: 'update',
     data: bill,
+  })
+}
+
+export async function getHomeBillSummary(begin: number, end: number) {
+  return request<HomeBillSummary>({
+    type,
+    method: 'home_summary',
+    data: { begin, end },
+  })
+}
+
+export async function getHomeBillReport(begin: number, end: number) {
+  return request<HomeBillReport[]>({
+    type,
+    method: 'home_report',
+    data: { begin, end },
   })
 }
