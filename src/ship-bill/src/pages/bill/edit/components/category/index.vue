@@ -9,7 +9,7 @@
         <wd-text color="#000" :text="billCategory.name" size="40rpx" bold />
       </view>
 
-      <wd-input label="金额" placeholder="分类金额" type="number" v-model="billCategory.total" />
+      <wd-input label="金额" placeholder="分类金额" type="number" v-model="total" />
     </view>
 
     <view class="m-3">
@@ -62,11 +62,19 @@ const filterCategories = ref<Category[]>([])
 const billCategory = ref<BillCategory>(initBillCategory)
 const categories = ref<Category[]>([])
 
+const total = computed({
+  get() {
+    return billCategory.value.total === 0 ? '' : billCategory.value.total.toString()
+  },
+  set(value: string) {
+    billCategory.value.total = Number(value)
+  },
+})
+
 watch(
   () => props.modelValue,
   (nweShow) => {
     showPopup.value = nweShow
-
     initData(nweShow)
   },
 )

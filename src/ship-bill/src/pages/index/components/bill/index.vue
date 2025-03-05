@@ -19,23 +19,26 @@
       </view>
     </view>
     <wd-cell-group border>
-      <view class="container">
-        <view v-for="bill in data" :key="bill._id" class="p-2 m-2 bg-slate-100 rounded-md">
-          <view class="flex flex-row items-center">
-            <view class="flex-1 flex flex-row items-center" style="flex-grow: 1">
-              <wd-img
-                round
-                :width="35"
-                :height="35"
-                src="https://q1.qlogo.cn/g?b=qq&nk=754433528&s=100"
-              />
-              <view class="flex-1 col-span-3 flex flex-col ml-2 text-base">
-                <view>{{ 'ddddd' }}</view>
-                <wd-text :lines="1" :text="bill.remark" />
-              </view>
+      <view
+        v-for="bill in data"
+        :key="bill._id"
+        class="p-2 m-2 bg-slate-100 rounded-md"
+        @click="() => handleClickBillItem(bill)"
+      >
+        <view class="flex flex-row items-center">
+          <view class="flex-1 flex flex-row items-center" style="flex-grow: 1">
+            <wd-img
+              round
+              :width="35"
+              :height="35"
+              src="https://q1.qlogo.cn/g?b=qq&nk=754433528&s=100"
+            />
+            <view class="flex-1 col-span-3 flex flex-col ml-2 text-base">
+              <view>{{ 'ddddd' }}</view>
+              <wd-text :lines="1" :text="bill.remark" />
             </view>
-            <wd-text class="float-right" mode="price" :text="bill.amount" bold />
           </view>
+          <wd-text class="float-right" mode="price" :text="bill.amount" bold />
         </view>
       </view>
     </wd-cell-group>
@@ -43,6 +46,7 @@
 </template>
 
 <script lang="ts" setup>
+import { Bill } from '@/service'
 import dayjs from 'dayjs'
 
 const data = [
@@ -126,6 +130,12 @@ onLoad(() => {
   maxHeight.value = Math.round(0.6 * windowHeight)
   anchors.value = [80, maxHeight.value]
 })
+
+const handleClickBillItem = (bill: any) => {
+  uni.navigateTo({
+    url: '/pages/bill/edit/index?id=' + bill._id,
+  })
+}
 
 const handleChangeType = () => {
   console.log(type.value)

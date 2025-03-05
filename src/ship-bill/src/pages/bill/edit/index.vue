@@ -25,7 +25,7 @@
       :style="{ height: `calc(100vh - ${safeAreaInsets?.top}px - 64px)` }"
     >
       <view class="sticky top-0 bg-white z-[9]">
-        <view class="w-50">
+        <view v-if="!isModify" class="w-50">
           <wd-segmented
             :options="types"
             v-model:value="type"
@@ -38,7 +38,7 @@
             mode="price"
             :color="isExpendString(type) ? '#80CBC4' : '#B82132'"
             size="35px"
-            :text="bill.amount"
+            :text="amount"
             bold
           />
         </view>
@@ -53,7 +53,7 @@
               no-border
               type="number"
               :placeholder="feePlaceholder"
-              custom-style="display: inline-block; width: 60px; vertical-align: middle;"
+              custom-style="display: inline-block;border-radius: 5px; width: 60px;text-align: center; background-color:#f8fafc;"
             />
             <text class="ml-1">{{ feeUnit }}</text>
           </view>
@@ -65,7 +65,7 @@
               no-border
               type="number"
               :placeholder="ratesPlaceholder"
-              custom-style="display: inline-block; width: 60px; vertical-align: middle;"
+              custom-style="display: inline-block;border-radius: 5px; width: 60px;text-align: center;background-color:#f8fafc;"
             />
             <text class="ml-1">{{ ratesUnit }}</text>
           </view>
@@ -151,7 +151,7 @@
     </view>
     <view class="w-full absolute bottom-5">
       <view class="mx-6">
-        <wd-button block size="large" custom-class="custom-shadow" :loading="saveLoading">
+        <wd-button block size="large" :loading="saveLoading" @click="handleClickSave">
           保存
         </wd-button>
       </view>
@@ -162,7 +162,7 @@
 <script lang="ts" setup>
 import dayjs from 'dayjs'
 import CategoryPopup from './components/category/index.vue'
-import { BillCategory } from '@/service'
+import { BillCategory, createBill, updateBill } from '@/service'
 import { getBillType, isExpendString } from '@/utils/bill'
 import { useConfigStore } from '@/store'
 
@@ -194,15 +194,17 @@ const ratesLabel = ref('油价')
 const ratesPlaceholder = ref('油价')
 const ratesUnit = ref('元')
 
-const oilPrices = configState.oilPrices === 0 ? '' : configState.oilPrices.toString()
-const commission = configState.commission === 0 ? '' : configState.commission.toString()
-const fee = ref('')
-const rates = ref(oilPrices)
-const expendFee = ref('')
-const expendRates = ref(oilPrices)
-const incomeFee = ref('')
-const incomeRates = ref(commission)
+const oilPrices = configState.oilPrices === 0 ? '' : configState.oilPrices
+const commission = configState.commission === 0 ? '' : configState.commission
+const fee = ref<number | ''>('')
+const rates = ref<number | ''>(oilPrices)
+const expendFee = ref<number | ''>('')
+const expendRates = ref<number | ''>(oilPrices)
+const incomeFee = ref<number | ''>('')
+const incomeRates = ref<number | ''>(commission)
 
+const isModify = ref<boolean>(false)
+const billId = ref()
 const pickCategoryShow = ref<boolean>(false)
 const types = ref(['支出', '收入'])
 const type = ref('支出')
@@ -213,6 +215,14 @@ const expendCategories = ref<BillCategory[]>([])
 const incomeCategories = ref<BillCategory[]>([])
 const inputCategory = ref<BillCategory>()
 const inputCategoryIndex = ref<number>(-1)
+
+const amount = computed(() => {
+  const categoryTotal = billCategories.value.map((item) => item.total).reduce((a, b) => a + b, 0)
+  // console.log('总计', fee.value, rates.value)
+  const feeNum = isNaN(Number(fee.value)) ? 0 : Number(fee.value)
+  const ratesNum = isNaN(Number(rates.value)) ? 0 : Number(rates.value)
+  return (categoryTotal + feeNum * ratesNum).toString()
+})
 
 watch(
   () => type.value,
@@ -235,7 +245,12 @@ watch(
   },
 )
 
-onLoad(() => {})
+onLoad((option) => {
+  if (option.id) {
+    isModify.value = true
+    billId.value = option.id
+  }
+})
 
 const handleClickLeft = () => {
   uni.navigateBack({
@@ -296,6 +311,50 @@ const handleChangeType = ({ value }) => {
   billCategories.value = isExpend ? expendCategories.value : incomeCategories.value
   fee.value = isExpend ? expendFee.value : incomeFee.value
   rates.value = isExpend ? expendRates.value : incomeRates.value
+}
+
+const handleClickSave = async () => {
+  saveLoading.value = true
+  if (isModify.value) {
+    updateBill({
+      fee: Number(fee.value),
+      rates: Number(rates.value),
+      amount: Number(amount.value),
+      address: bill.value.address,
+      counter: bill.value.counter,
+      sub_counter: bill.value.sub_counter,
+      remark: bill.value.remark,
+      date: bill.value.date,
+      categorys: billCategories.value,
+    })
+      .then((res) => {})
+      .catch((err) => {
+        uni.showToast({ icon: 'error', title: '保存失败' + err.message })
+      })
+      .finally(() => {
+        saveLoading.value = false
+      })
+  } else {
+    createBill({
+      fee: Number(fee.value),
+      rates: Number(rates.value),
+      type: bill.value.type,
+      amount: Number(amount.value),
+      address: bill.value.address,
+      counter: bill.value.counter,
+      sub_counter: bill.value.sub_counter,
+      remark: bill.value.remark,
+      date: bill.value.date,
+      categorys: billCategories.value,
+    })
+      .then((res) => {})
+      .catch((err) => {
+        uni.showToast({ icon: 'error', title: '保存失败' + err.message })
+      })
+      .finally(() => {
+        saveLoading.value = false
+      })
+  }
 }
 </script>
 

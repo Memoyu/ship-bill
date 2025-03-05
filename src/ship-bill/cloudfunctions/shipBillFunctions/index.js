@@ -6,13 +6,19 @@ const updateUser = require('./user/update/index');
 const getOpenId = require('./user/openid/index');
 const getUser = require('./user/get/index');
 
-const getCategories = require('./categories/list/index');
-const createCategory = require('./categories/create/index');
-const updateCategory = require('./categories/update/index');
-const deleteCategory = require('./categories/delete/index');
+const getCategories = require('./category/list/index');
+const createCategory = require('./category/create/index');
+const updateCategory = require('./category/update/index');
+const deleteCategory = require('./category/delete/index');
 
 const updateConfig = require('./config/update/index');
 const getConfig = require('./config/get/index');
+
+const createBill = require('./bill/create/index');
+const updateBill = require('./bill/update/index');
+const deleteBill = require('./bill/delete/index');
+const getBills = require('./bill/list/index');
+const getBill = require('./bill/get/index');
 
 cloud.init({
   env: cloud.DYNAMIC_CURRENT_ENV
@@ -29,7 +35,7 @@ const mapUser = async (event, context) => {
     case 'get':
       return await getUser.main(event, context);
     default:
-      throw new Error("未定义method");
+      throw new Error("未定义User method:" + event.method);
   }
 }
 
@@ -44,15 +50,25 @@ const mapCategory = async (event, context) => {
     case 'delete':
       return await deleteCategory.main(event, context);
     default:
-      throw new Error("未定义method");
+      throw new Error("未定义Category method:" + event.method);
   }
 }
 
 const mapBill = async (event, context) => {
-  // switch (event.method) {
-  //   case 'list':
-  //     return await getCategories.main(event, context);
-  // }
+  switch (event.method) {
+    case 'create':
+      return await createBill.main(event, context);
+    case 'update':
+      return await updateBill.main(event, context);
+    case 'delete':
+      return await deleteBill.main(event, context);
+    case 'list':
+      return await getBills.main(event, context);
+    case 'get':
+      return await getBill.main(event, context);
+    default:
+      throw new Error("未定义Bill method:" + event.method);
+  }
 }
 
 const mapConfig = async (event, context) => {
@@ -62,7 +78,7 @@ const mapConfig = async (event, context) => {
     case 'get':
       return await getConfig.main(event, context);
     default:
-      throw new Error("未定义method");
+      throw new Error("未定义Config method:" + event.method);
   }
 }
 
@@ -84,7 +100,7 @@ exports.main = async (event, context) => {
         data = await mapConfig(event, context);
         break;
       default:
-        throw new Error("未定义type");
+        throw new Error("未定义type:" + event.type);
     }
 
     return {

@@ -11,6 +11,8 @@ export type Bill = {
   _id: string
   openid: string
   type: number
+  fee: number
+  rates: number
   amount: number
   address: string
   counter: string
@@ -24,19 +26,49 @@ export type Bill = {
 
 export type CreateBill = {
   type: number
+  fee: number
+  rates: number
   amount: number
   address: string
   counter: string
   sub_counter: string
   remark: string
-  date: string
+  date: number
   categorys: BillCategory[]
+}
+
+export type UpdateBill = {
+  fee: number
+  rates: number
+  amount: number
+  address: string
+  counter: string
+  sub_counter: string
+  remark: string
+  date: number
+  categorys: BillCategory[]
+}
+
+export async function getBill(id: string) {
+  return request<Bill>({
+    type,
+    method: 'get',
+    data: id,
+  })
 }
 
 export async function createBill(bill: CreateBill) {
   return request<Bill>({
     type,
     method: 'create',
+    data: bill,
+  })
+}
+
+export async function updateBill(bill: UpdateBill) {
+  return request<Bill>({
+    type,
+    method: 'update',
     data: bill,
   })
 }
