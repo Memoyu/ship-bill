@@ -24,8 +24,11 @@ exports.main = async (event, context) => {
 
   // 获取起止事件内的每一天
   let dateList = [];
-  let startTime = new Date(event.data.begin);
-  let endTime = new Date(event.data.end);
+  var timeZoneDiff = 8; // 目标时区(北京时区)，GMT+8
+  var offsetTime = new Date().getTimezoneOffset(); // 本地时间和UTC0时的时间差，单位为分钟
+  let startTime = new Date(event.data.begin + offsetTime * 60 * 1000 + timeZoneDiff * 60 * 60 * 1000);
+  let endTime = new Date(event.data.end + offsetTime * 60 * 1000 + timeZoneDiff * 60 * 60 * 1000);
+  console.log('时间戳', startTime, endTime)
   while ((endTime.getTime() - startTime.getTime()) >= 0) {
     var year = startTime.getFullYear();
     var month = startTime.getMonth() + 1 < 10 ? '0' + (startTime.getMonth() + 1) : startTime.getMonth() + 1;
