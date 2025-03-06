@@ -14,8 +14,8 @@
           <view>{{ dayjs(report.date).year() }}</view>
           <wd-text color="#000" :text="dayjs(report.date).format('MM-DD')" bold />
         </view>
-        <view class="col-span-3">收: {{ report.income }}</view>
         <view class="col-span-3">支: {{ report.expend }}</view>
+        <view class="col-span-3">收: {{ report.income }}</view>
       </view>
     </view>
   </view>

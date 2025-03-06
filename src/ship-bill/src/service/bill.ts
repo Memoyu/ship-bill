@@ -24,6 +24,18 @@ export type Bill = {
   createTime: number
 }
 
+export type GetBills = {
+  type: number
+  begin: number
+  end: number
+}
+
+export type BillsWithTotal = {
+  items: Bill[]
+  expend: number
+  income: number
+}
+
 export type CreateBill = {
   type: number
   fee: number
@@ -73,6 +85,14 @@ export async function getBill(id: string) {
     type,
     method: 'get',
     data: id,
+  })
+}
+
+export async function getBills(req: GetBills) {
+  return request<BillsWithTotal>({
+    type,
+    method: 'list',
+    data: req,
   })
 }
 

@@ -315,45 +315,41 @@ const handleChangeType = ({ value }) => {
 
 const handleClickSave = async () => {
   saveLoading.value = true
-  if (isModify.value) {
-    updateBill({
-      fee: Number(fee.value),
-      rates: Number(rates.value),
-      amount: Number(amount.value),
-      address: bill.value.address,
-      counter: bill.value.counter,
-      sub_counter: bill.value.sub_counter,
-      remark: bill.value.remark,
-      date: bill.value.date,
-      categorys: billCategories.value,
-    })
-      .then((res) => {})
-      .catch((err) => {
-        uni.showToast({ icon: 'error', title: '保存失败' + err.message })
+
+  try {
+    if (isModify.value) {
+      updateBill({
+        fee: Number(fee.value),
+        rates: Number(rates.value),
+        amount: Number(amount.value),
+        address: bill.value.address,
+        counter: bill.value.counter,
+        sub_counter: bill.value.sub_counter,
+        remark: bill.value.remark,
+        date: bill.value.date,
+        categorys: billCategories.value,
+      }).then((res) => {})
+    } else {
+      createBill({
+        fee: Number(fee.value),
+        rates: Number(rates.value),
+        type: bill.value.type,
+        amount: Number(amount.value),
+        address: bill.value.address,
+        counter: bill.value.counter,
+        sub_counter: bill.value.sub_counter,
+        remark: bill.value.remark,
+        date: bill.value.date,
+        categorys: billCategories.value,
+      }).then((res) => {
+        uni.showToast({ icon: 'none', title: '保存成功' })
+        uni.navigateBack()
       })
-      .finally(() => {
-        saveLoading.value = false
-      })
-  } else {
-    createBill({
-      fee: Number(fee.value),
-      rates: Number(rates.value),
-      type: bill.value.type,
-      amount: Number(amount.value),
-      address: bill.value.address,
-      counter: bill.value.counter,
-      sub_counter: bill.value.sub_counter,
-      remark: bill.value.remark,
-      date: bill.value.date,
-      categorys: billCategories.value,
-    })
-      .then((res) => {})
-      .catch((err) => {
-        uni.showToast({ icon: 'error', title: '保存失败' + err.message })
-      })
-      .finally(() => {
-        saveLoading.value = false
-      })
+    }
+  } catch (err) {
+    uni.showToast({ icon: 'error', title: '保存失败' + err.message })
+  } finally {
+    saveLoading.value = false
   }
 }
 </script>

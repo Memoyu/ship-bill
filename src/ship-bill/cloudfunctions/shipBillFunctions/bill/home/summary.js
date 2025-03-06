@@ -7,9 +7,9 @@ cloud.init({
 const db = cloud.database();
 
 exports.main = async (event, context) => {
-  let billCol = db.collection('bills');
   let openid = wxctx.getOpenId();
 
+  let billCol = db.collection('bills');
   const _ = db.command
   let res = await billCol.where(
     _.and([{
