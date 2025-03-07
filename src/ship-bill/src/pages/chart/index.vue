@@ -29,7 +29,12 @@
         <view class="flex justify-between items-center">
           <view>账期</view>
           <view>
-            <wd-datetime-picker type="date" size="large" v-model="value" @confirm="handleConfirm" />
+            <wd-datetime-picker
+              type="date"
+              size="large"
+              v-model="dates"
+              @confirm="handleConfirmDatePicker"
+            />
           </view>
         </view>
 
@@ -45,16 +50,16 @@
         <view :class="['flex', 'px-3', type == types[0] ? 'justify-between' : 'justify-center']">
           <view v-if="type == types[0] || type == types[1]">
             <wd-text size="15px" bold text="支: " />
-            <wd-text size="15px" type="error" bold mode="price" text="900000" />
+            <wd-text size="15px" :color="expendColor" bold mode="price" :text="expend" />
           </view>
           <view v-if="type == types[0] || type == types[2]">
-            <wd-text size="15px" bold text="收: " />
-            <wd-text size="15px" type="primary" bold mode="price" text="900000" />
+            <wd-text size="15px" :color="incomeColor" bold text="收: " />
+            <wd-text color="$uni-color-success" size="15px" bold mode="price" :text="income" />
           </view>
         </view>
       </view>
 
-      <view v-for="bill in data" :key="bill._id">
+      <view v-for="bill in bills" :key="bill._id">
         <BillItem :bill="bill" />
       </view>
     </view>
@@ -63,7 +68,9 @@
 
 <script lang="ts" setup>
 import dayjs from 'dayjs'
-import BillItem from './components/bill/index.vue'
+import BillItem from '@/components/bill-item/index.vue'
+import { Bill, getBills } from '@/service'
+import { getBillType } from '@/utils/bill'
 
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
@@ -72,83 +79,16 @@ defineOptions({
   name: 'Chart',
 })
 
-const data = [
-  {
-    _id: '11111',
-    type: 0,
-    amount: 100,
-    remark: '测试备注111',
-  },
-  {
-    _id: '2222',
-    type: 0,
-    amount: 100,
-    remark: '测试备注测试备注测试备注测试备注3333测试备注测试备注',
-  },
-  {
-    _id: '3333',
-    type: 0,
-    amount: 100,
-    remark: '测试备注2',
-  },
-  {
-    _id: '444444',
-    type: 0,
-    amount: 100,
-    remark: '测试备注3',
-  },
-  {
-    _id: '4434444',
-    type: 0,
-    amount: 100,
-    remark: '测试备注3',
-  },
-  {
-    _id: '4445444',
-    type: 0,
-    amount: 100,
-    remark: '测试备注3',
-  },
-  {
-    _id: '4446444',
-    type: 0,
-    amount: 100,
-    remark: '测试备注3',
-  },
-  {
-    _id: '4444744',
-    type: 0,
-    amount: 100,
-    remark: '测试备注3',
-  },
-  {
-    _id: '44447424',
-    type: 0,
-    amount: 100,
-    remark: '测试备注3',
-  },
-  {
-    _id: '44447344',
-    type: 0,
-    amount: 100,
-    remark: '测试备注3',
-  },
-  {
-    _id: '44447444',
-    type: 0,
-    amount: 100,
-    remark: '测试备注3',
-  },
-  {
-    _id: '44447454',
-    type: 0,
-    amount: 100,
-    remark: '测试备注3',
-  },
-]
+const expendColor = getCurrentInstance().appContext.config.globalProperties.expendColor
+const incomeColor = getCurrentInstance().appContext.config.globalProperties.incomeColor
 const types = ref(['全部', '支出', '收入'])
 const type = ref('全部')
-const value = ref<any[]>([dayjs().subtract(1, 'day').toDate(), Date.now()])
+const dates = ref<any[]>([dayjs().subtract(1, 'month').toDate(), Date.now()])
+
+const sourceBills = ref<Bill[]>([])
+const bills = ref<Bill[]>([])
+const expend = ref<number>(0)
+const income = ref<number>(0)
 
 onLoad(() => {})
 
@@ -160,12 +100,27 @@ const handleClickLeft = () => {
   })
 }
 
-const handleConfirm = ({ value }) => {
+const handleConfirmDatePicker = ({ value }) => {
   console.log(new Date(value))
 }
 
 const handleChangeType = () => {
   console.log(type.value)
+}
+
+const getBillList = () => {
+  const t = type.value === '全部' ? 0 : getBillType(type.value)
+
+  getBills({
+    type: t,
+    begin: dates.value[0],
+    end: dates.value[1],
+  }).then((res) => {
+    sourceBills.value = res.items
+    bills.value = res.items
+    expend.value = res.expend
+    income.value = res.income
+  })
 }
 </script>
 

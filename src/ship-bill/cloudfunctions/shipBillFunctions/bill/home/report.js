@@ -46,12 +46,16 @@ exports.main = async (event, context) => {
     let end = new Date(d + ' 23:59:59').valueOf();
     let expend = 0;
     let income = 0;
+    let expendCount = 0;
+    let incomeCount = 0;
     bills.map(b => {
       if (b.createTime >= begin && b.createTime <= end) {
         if (b.type === 1) {
           expend += b.amount;
+          expendCount += 1;
         } else if (b.type === 2) {
           income += b.amount;
+          incomeCount += 1;
         }
       }
     })
@@ -59,7 +63,9 @@ exports.main = async (event, context) => {
     reports.push({
       date: d,
       expend,
-      income
+      income,
+      expendCount,
+      incomeCount
     })
   })
 

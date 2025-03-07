@@ -24,41 +24,17 @@
         >
           <view v-if="type == types[0] || type == types[1]">
             <wd-text size="15px" bold text="支: " />
-            <wd-text size="15px" type="error" bold mode="price" :text="expend" />
+            <wd-text size="15px" :color="expendColor" bold mode="price" :text="expend" />
           </view>
           <view v-if="type == types[0] || type == types[2]">
             <wd-text size="15px" bold text="收: " />
-            <wd-text size="15px" type="primary" bold mode="price" :text="income" />
+            <wd-text size="15px" :color="incomeColor" bold mode="price" :text="income" />
           </view>
         </view>
       </view>
       <wd-cell-group border>
-        <view
-          v-for="bill in bills"
-          :key="bill._id"
-          class="m-2 p-2 bg-slate-100 rounded-md bill-card"
-          @click="() => handleClickBillItem(bill)"
-        >
-          <view class="flex flex-row items-center">
-            <view class="flex-1 flex flex-row items-center" style="flex-grow: 1">
-              <view
-                class="rounded-full bg-white h-[80rpx] w-[80rpx] flex justify-center items-center"
-              >
-                <wd-text
-                  :color="isExpendType(bill.type) ? '#80CBC4' : '#B82132'"
-                  :text="isExpendType(bill.type) ? '支' : '收'"
-                  bold
-                />
-              </view>
-
-              <view class="flex-1 col-span-3 flex flex-col ml-2 text-base">
-                <wd-text color="#000" :lines="1" :text="getBillCategoryText(bill)" size="13px" />
-                <wd-text color="#000" :lines="1" :text="getBillFeeText(bill)" size="13px" />
-                <wd-text :lines="1" :text="bill.remark" size="13px" />
-              </view>
-            </view>
-            <wd-text class="float-right" mode="price" :text="bill.amount" bold />
-          </view>
+        <view v-for="bill in bills" :key="bill._id" class="m-2 p-2 bg-slate-100 rounded-md">
+          <BillItem :bill="bill" />
         </view>
       </wd-cell-group>
     </view>
@@ -67,13 +43,17 @@
 
 <script lang="ts" setup>
 import { Bill, getBills } from '@/service'
-import { getBillType, isExpendType } from '@/utils/bill'
+import { getBillType } from '@/utils/bill'
 import dayjs from 'dayjs'
+import BillItem from '@/components/bill-item/index.vue'
 
 const props = defineProps<{ show: boolean; date: string }>()
 const emits = defineEmits<{
   (e: 'update:show', value: boolean): void
 }>()
+
+const expendColor = getCurrentInstance().appContext.config.globalProperties.expendColor
+const incomeColor = getCurrentInstance().appContext.config.globalProperties.incomeColor
 const types = ref(['全部', '支出', '收入'])
 const type = ref('全部')
 const minHeight = 80
@@ -110,12 +90,6 @@ onLoad(() => {
   getBillList()
 })
 
-const handleClickBillItem = (bill: any) => {
-  uni.navigateTo({
-    url: '/pages/bill/edit/index?id=' + bill._id,
-  })
-}
-
 const handleChangeType = () => {
   // console.log(type.value)
   if (type.value === '全部') {
@@ -144,22 +118,6 @@ const getBillList = () => {
     expend.value = res.expend
     income.value = res.income
   })
-}
-
-const getBillCategoryText = (bill: Bill) => {
-  const categorys = bill.categorys.map((item) => {
-    return item.name
-  })
-  return categorys.join(', ')
-}
-
-const getBillFeeText = (bill: Bill) => {
-  if (bill.fee === 0) return ''
-  if (isExpendType(bill.type)) {
-    return `加油: ${bill.fee}升 / ${bill.rates}元/升`
-  } else {
-    return `产值: ${bill.fee}元 / ${bill.rates}%`
-  }
 }
 </script>
 

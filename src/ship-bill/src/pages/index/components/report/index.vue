@@ -6,16 +6,37 @@
     <view
       v-for="(report, index) in reports"
       :key="index"
-      class="p-2 m-2 bg-white rounded-md"
+      class="px-4 py-2 m-2 bg-white rounded-md"
       @click="() => handleClickItem(report)"
     >
-      <view class="grid grid-cols-9 gap-3 items-center">
-        <view class="col-span-3 flex flex-col">
-          <view>{{ dayjs(report.date).year() }}</view>
-          <wd-text color="#000" :text="dayjs(report.date).format('MM-DD')" bold />
+      <view class="mb-2 flex justify-between items-center">
+        <wd-text color="#000" :text="report.date" bold />
+        <view class="flex items-center">
+          <view class="flex items-center">
+            <view class="ml-2">
+              <wd-text :text="report.expendCount" bold />
+            </view>
+          </view>
+          <view class="flex items-center ml-4">
+            <view class="ml-2">
+              <wd-text :text="report.incomeCount" bold />
+            </view>
+          </view>
         </view>
-        <view class="col-span-3">支: {{ report.expend }}</view>
-        <view class="col-span-3">收: {{ report.income }}</view>
+      </view>
+      <view class="flex justify-between items-center">
+        <view class="flex items-center">
+          <view class="mr-2">
+            <wd-icon class-prefix="iconfont" name="expend" />
+          </view>
+          <wd-text :text="report.expend" bold />
+        </view>
+        <view class="flex items-center">
+          <view class="mr-2">
+            <wd-icon class-prefix="iconfont" name="income" />
+          </view>
+          <wd-text :text="report.income" bold />
+        </view>
       </view>
     </view>
   </view>
@@ -45,7 +66,7 @@ watch(
 onLoad(() => {
   const begin = dayjs().startOf('month').valueOf()
   const end = dayjs().endOf('month').valueOf()
-  console.log('时间戳', begin, end, new Date(begin), new Date(end))
+  // console.log('时间戳', begin, end, new Date(begin), new Date(end))
   getHomeBillReport(begin, end)
     .then((res) => {
       setReports(res)

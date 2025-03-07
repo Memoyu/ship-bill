@@ -77,6 +77,8 @@ export type HomeBillSummary = {
 export type HomeBillReport = {
   expend: number
   income: number
+  expendCount: number
+  incomeCount: number
   date: string
 }
 

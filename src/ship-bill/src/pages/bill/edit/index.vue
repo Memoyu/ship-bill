@@ -314,6 +314,11 @@ const handleChangeType = ({ value }) => {
 }
 
 const handleClickSave = async () => {
+  const amountNum = Number(amount.value)
+  if (amountNum <= 0) {
+    uni.showToast({ icon: 'none', title: '总金额不能为0' })
+  }
+
   saveLoading.value = true
 
   try {
@@ -321,7 +326,7 @@ const handleClickSave = async () => {
       updateBill({
         fee: Number(fee.value),
         rates: Number(rates.value),
-        amount: Number(amount.value),
+        amount: amountNum,
         address: bill.value.address,
         counter: bill.value.counter,
         sub_counter: bill.value.sub_counter,
@@ -334,7 +339,7 @@ const handleClickSave = async () => {
         fee: Number(fee.value),
         rates: Number(rates.value),
         type: bill.value.type,
-        amount: Number(amount.value),
+        amount: amountNum,
         address: bill.value.address,
         counter: bill.value.counter,
         sub_counter: bill.value.sub_counter,

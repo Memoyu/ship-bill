@@ -9,6 +9,10 @@ import store from './store'
 
 export function createApp() {
   const app = createSSRApp(App)
+
+  app.config.globalProperties.expendColor = '#B82132'
+  app.config.globalProperties.incomeColor = '#2BA245'
+
   app.use(store)
   app.use(routeInterceptor)
   app.use(prototypeInterceptor)
