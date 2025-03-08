@@ -15,9 +15,9 @@ exports.main = async (event, context) => {
   let wheres = [{
     openid: openid
   }, {
-    createTime: _.gte(event.data.begin)
+    date: _.gte(event.data.begin)
   }, {
-    createTime: _.lte(event.data.end)
+    date: _.lte(event.data.end)
   }];
   if (event.data.type !== 0) {
     wheres.push({
@@ -27,7 +27,7 @@ exports.main = async (event, context) => {
 
   let res = await billCol.where(
     _.and(wheres)
-  ).get();
+  ).orderBy('date', 'desc').orderBy('createTime', 'desc').get();
 
   let income = 0;
   let expend = 0;

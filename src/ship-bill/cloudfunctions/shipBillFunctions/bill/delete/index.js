@@ -7,20 +7,15 @@ cloud.init({
 const db = cloud.database();
 
 exports.main = async (event, context) => {
-  let data = event.data;
-  if (!data) throw new Error("账单数据不能为空");
-  let openid = wxctx.getOpenId();
-  if (!openid) throw new Error("用户openid获取失败");
+  if (!event.data) throw new Error("账单id不能为空");
 
   let billCol = db.collection('bills');
+  let res = await billCol.doc(event.data).get();
+  if (!res.data) {
+    throw new Error("账单不存在");
+  }
 
-  data.openid = openid;
-  data.updateTime = Date.now();
-  data.createTime = Date.now();
-  let res = await billCol.add({
-    data
-  });
-  data._id = res._id;
+  let delRes = await billCol.doc(event.data).remove();
 
-  return data;
+  return delRes.data;
 };

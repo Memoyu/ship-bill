@@ -9,6 +9,9 @@ const db = cloud.database();
 exports.main = async (event, context) => {
   let data = event.data;
   if (!data) throw new Error("账单数据不能为空");
+  if (!data.amount || data.amount <= 0) throw new Error("账单总额不能为0");
+  if (!data.date || data.date <= 0) throw new Error("账单日期不能为空");
+
   let openid = wxctx.getOpenId();
   if (!openid) throw new Error("用户openid获取失败");
 

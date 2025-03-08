@@ -23,7 +23,7 @@
 
     <view
       class="overflow-y-auto"
-      :style="{ height: `calc(100vh - ${safeAreaInsets?.top}px - 64px)` }"
+      :style="{ height: `calc(100vh - ${safeAreaInsets?.top}px - 60px)` }"
     >
       <view class="z-50 sticky top-0 bg-white py-2">
         <view class="flex justify-between items-center">
@@ -49,18 +49,23 @@
 
         <view :class="['flex', 'px-3', type == types[0] ? 'justify-between' : 'justify-center']">
           <view v-if="type == types[0] || type == types[1]">
-            <wd-text size="15px" bold text="支: " />
-            <wd-text size="15px" :color="expendColor" bold mode="price" :text="expend" />
+            <wd-text bold text="支: " />
+            <wd-text :color="expendColor" bold mode="price" :text="expend" />
           </view>
           <view v-if="type == types[0] || type == types[2]">
-            <wd-text size="15px" :color="incomeColor" bold text="收: " />
-            <wd-text color="$uni-color-success" size="15px" bold mode="price" :text="income" />
+            <wd-text :color="incomeColor" bold text="收: " />
+            <wd-text :color="incomeColor" bold mode="price" :text="income" />
           </view>
         </view>
       </view>
 
-      <view v-for="bill in bills" :key="bill._id">
-        <BillItem :bill="bill" />
+      <view v-if="bills.length > 0">
+        <view v-for="bill in bills" :key="bill._id" class="my-3 p-2 bg-slate-100 rounded-md">
+          <BillItem :bill="bill" />
+        </view>
+      </view>
+      <view v-else class="flex items-center">
+        <wd-status-tip image="content" tip="暂无账单" />
       </view>
     </view>
   </view>
@@ -83,14 +88,16 @@ const expendColor = getCurrentInstance().appContext.config.globalProperties.expe
 const incomeColor = getCurrentInstance().appContext.config.globalProperties.incomeColor
 const types = ref(['全部', '支出', '收入'])
 const type = ref('全部')
-const dates = ref<any[]>([dayjs().subtract(1, 'month').toDate(), Date.now()])
+const dates = ref<any[]>([dayjs().subtract(1, 'month').toDate().valueOf(), Date.now().valueOf()])
 
 const sourceBills = ref<Bill[]>([])
 const bills = ref<Bill[]>([])
 const expend = ref<number>(0)
 const income = ref<number>(0)
 
-onLoad(() => {})
+onLoad(() => {
+  getBillList()
+})
 
 const handleClickLeft = () => {
   uni.navigateBack({

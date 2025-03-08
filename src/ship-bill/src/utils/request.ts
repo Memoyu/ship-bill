@@ -1,3 +1,5 @@
+import { useUserStore } from '@/store'
+
 const functionName = 'shipBillFunctions'
 
 export type CallFunctionOptions = {
@@ -13,8 +15,23 @@ export type CallFunctionResult<T> = {
   data: T
 }
 
+const ignores = ['USER:openid', 'USER:create', 'USER:update', 'USER:get']
+
+const isLogined = () => {
+  const userStore = useUserStore()
+  return userStore.isLogined
+}
+
+const isIgnore = (type: string, method: string) => {
+  return ignores.findIndex((i) => i === `${type}:${method}`) > -1
+}
+
 const http = <T>(options: CallFunctionOptions) => {
   return new Promise<T>((resolve, reject) => {
+    // console.log('isLogined', isLogined(), isIgnore(options.type, options.method))
+    console.log('request type & method', options.type, options.method)
+    if (!isLogined() && !isIgnore(options.type, options.method)) return reject(new Error('未登录'))
+
     wx.cloud.callFunction({
       name: functionName,
       data: {
@@ -23,7 +40,7 @@ const http = <T>(options: CallFunctionOptions) => {
         data: options.data,
       },
       success: function (res) {
-        console.log(res)
+        // console.log(res)
         let errMsg = res.errMsg
         if (res.errMsg === 'cloud.callFunction:ok') {
           const result = res.result as CallFunctionResult<T>

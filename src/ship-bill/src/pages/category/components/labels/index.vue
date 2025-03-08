@@ -95,18 +95,19 @@ const handleClickDeleteCategory = (category) => {
     })
     .then(() => {
       uni.showLoading({
-        title: '保存中',
+        title: '删除中',
       })
       deleteCategory(category._id)
         .then((res) => {
           const categories = [...props.categories]
           const filters = categories.filter((c) => c._id !== res._id)
           emits('update:categories', filters)
-          uni.hideLoading()
         })
         .catch((e) => {
-          uni.hideLoading()
           console.log(e)
+        })
+        .finally(() => {
+          uni.hideLoading()
         })
     })
 }

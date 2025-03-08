@@ -3,6 +3,7 @@
  * 支出: 1, 收入: 2
  */
 export const isExpendType = (type: number) => type === 1
+export const isIncomeType = (type: number) => type === 2
 
 /**
  * 获取账单类型

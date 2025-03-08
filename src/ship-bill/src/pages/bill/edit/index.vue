@@ -36,7 +36,7 @@
         <view class="my-2 ml-4">
           <wd-text
             mode="price"
-            :color="isExpendString(type) ? '#80CBC4' : '#B82132'"
+            :color="isExpendString(type) ? expendColor : incomeColor"
             size="35px"
             :text="amount"
             bold
@@ -49,7 +49,7 @@
           <view class="flex">
             <text class="inline-block w-12">{{ feeLabel }}:</text>
             <wd-input
-              v-model="fee"
+              v-model="total"
               no-border
               type="number"
               :placeholder="feePlaceholder"
@@ -74,7 +74,13 @@
 
       <view class="mt-1">
         <wd-cell-group>
-          <wd-datetime-picker label="日期" size="large" type="date" v-model="bill.date" />
+          <wd-datetime-picker
+            label="日期"
+            size="large"
+            type="date"
+            v-model="bill.date"
+            :maxDate="dayjs().valueOf()"
+          />
           <wd-input
             label="地址"
             label-width="50px"
@@ -150,9 +156,23 @@
       <view class="h-[128rpx]" />
     </view>
     <view class="w-full absolute bottom-5">
-      <view class="mx-6">
-        <wd-button block size="large" :loading="saveLoading" @click="handleClickSave">
+      <view class="mx-4 flex justify-between">
+        <wd-button
+          size="large"
+          :loading="saveLoading"
+          @click="handleClickSave"
+          custom-style="width: 60%;"
+        >
           保存
+        </wd-button>
+        <wd-button
+          v-if="isModify"
+          size="large"
+          type="error"
+          :loading="saveLoading"
+          @click="handleClickDelete"
+        >
+          删除
         </wd-button>
       </view>
     </view>
@@ -162,30 +182,29 @@
 <script lang="ts" setup>
 import dayjs from 'dayjs'
 import CategoryPopup from './components/category/index.vue'
-import { BillCategory, createBill, updateBill } from '@/service'
+import {
+  Bill,
+  BillCategory,
+  CreateBill,
+  createBill,
+  deleteBill,
+  getBill,
+  updateBill,
+} from '@/service'
 import { getBillType, isExpendString } from '@/utils/bill'
-import { useConfigStore } from '@/store'
+import { useConfigStore, useEditBillStore } from '@/store'
+import { useMessage } from 'wot-design-uni'
 
 defineOptions({
   name: 'EditBill',
 })
 
+const expendColor = getCurrentInstance().appContext.config.globalProperties.expendColor
+const incomeColor = getCurrentInstance().appContext.config.globalProperties.incomeColor
 const { safeAreaInsets } = uni.getSystemInfoSync()
-
-const bill = ref({
-  type: 1,
-  fee: 0,
-  rates: 0,
-  amount: 0,
-  address: '',
-  counter: '',
-  sub_counter: '',
-  remark: '',
-  date: Date.now(),
-  categorys: [],
-})
-
 const { configState } = useConfigStore()
+const { addBillAc, deleteBillAc, updateBillAc } = useEditBillStore()
+const message = useMessage()
 
 const feeLabel = ref('加油')
 const feePlaceholder = ref('加油量')
@@ -196,7 +215,7 @@ const ratesUnit = ref('元')
 
 const oilPrices = configState.oilPrices === 0 ? '' : configState.oilPrices
 const commission = configState.commission === 0 ? '' : configState.commission
-const fee = ref<number | ''>('')
+const total = ref<number | ''>('')
 const rates = ref<number | ''>(oilPrices)
 const expendFee = ref<number | ''>('')
 const expendRates = ref<number | ''>(oilPrices)
@@ -205,6 +224,19 @@ const incomeRates = ref<number | ''>(commission)
 
 const isModify = ref<boolean>(false)
 const billId = ref()
+const bill = ref<CreateBill>({
+  type: 1,
+  total: 0,
+  rates: 0,
+  amount: 0,
+  address: '',
+  counter: '',
+  sub_counter: '',
+  remark: '',
+  date: dayjs(dayjs().format('YYYY-MM-DD')).valueOf(),
+  categorys: [],
+})
+const sourceBill = ref<Bill>()
 const pickCategoryShow = ref<boolean>(false)
 const types = ref(['支出', '收入'])
 const type = ref('支出')
@@ -218,8 +250,8 @@ const inputCategoryIndex = ref<number>(-1)
 
 const amount = computed(() => {
   const categoryTotal = billCategories.value.map((item) => item.total).reduce((a, b) => a + b, 0)
-  // console.log('总计', fee.value, rates.value)
-  const feeNum = isNaN(Number(fee.value)) ? 0 : Number(fee.value)
+  // console.log('总计', total.value, rates.value)
+  const feeNum = isNaN(Number(total.value)) ? 0 : Number(total.value)
   const ratesNum = isNaN(Number(rates.value)) ? 0 : Number(rates.value)
   return (categoryTotal + feeNum * ratesNum).toString()
 })
@@ -249,6 +281,7 @@ onLoad((option) => {
   if (option.id) {
     isModify.value = true
     billId.value = option.id
+    getBillDetail(option.id)
   }
 })
 
@@ -301,19 +334,19 @@ const handleChangeType = ({ value }) => {
   if (isExpend) {
     // 收入切换为支出，则备份收入
     incomeCategories.value = billCategories.value
-    incomeFee.value = fee.value
+    incomeFee.value = total.value
     incomeRates.value = rates.value
   } else {
     expendCategories.value = billCategories.value
-    expendFee.value = fee.value
+    expendFee.value = total.value
     expendRates.value = rates.value
   }
   billCategories.value = isExpend ? expendCategories.value : incomeCategories.value
-  fee.value = isExpend ? expendFee.value : incomeFee.value
+  total.value = isExpend ? expendFee.value : incomeFee.value
   rates.value = isExpend ? expendRates.value : incomeRates.value
 }
 
-const handleClickSave = async () => {
+const handleClickSave = () => {
   const amountNum = Number(amount.value)
   if (amountNum <= 0) {
     uni.showToast({ icon: 'none', title: '总金额不能为0' })
@@ -324,7 +357,8 @@ const handleClickSave = async () => {
   try {
     if (isModify.value) {
       updateBill({
-        fee: Number(fee.value),
+        _id: billId.value,
+        total: Number(total.value),
         rates: Number(rates.value),
         amount: amountNum,
         address: bill.value.address,
@@ -333,10 +367,13 @@ const handleClickSave = async () => {
         remark: bill.value.remark,
         date: bill.value.date,
         categorys: billCategories.value,
-      }).then((res) => {})
+      }).then((res) => {
+        updateBillAc(sourceBill.value, res)
+        uni.showToast({ icon: 'none', title: '保存成功' })
+      })
     } else {
       createBill({
-        fee: Number(fee.value),
+        total: Number(total.value),
         rates: Number(rates.value),
         type: bill.value.type,
         amount: amountNum,
@@ -347,6 +384,7 @@ const handleClickSave = async () => {
         date: bill.value.date,
         categorys: billCategories.value,
       }).then((res) => {
+        addBillAc(res)
         uni.showToast({ icon: 'none', title: '保存成功' })
         uni.navigateBack()
       })
@@ -356,6 +394,43 @@ const handleClickSave = async () => {
   } finally {
     saveLoading.value = false
   }
+}
+
+const handleClickDelete = () => {
+  message
+    .confirm({
+      msg: `是否删除该账单?`,
+      title: '提示',
+    })
+    .then(() => {
+      uni.showLoading({
+        title: '删除中',
+      })
+      deleteBill(billId.value)
+        .then((res) => {
+          deleteBillAc(sourceBill.value)
+          uni.showToast({ icon: 'none', title: '删除成功' })
+          uni.navigateBack()
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+        .finally(() => {
+          uni.hideLoading()
+        })
+    })
+}
+
+const getBillDetail = (id: string) => {
+  console.log('获取账单详情')
+  getBill(id).then((res) => {
+    bill.value = res
+    sourceBill.value = { ...res }
+    type.value = res.type === 1 ? '支出' : '收入'
+    total.value = res.total
+    if (res.total !== 0) rates.value = res.rates
+    billCategories.value = res.categorys
+  })
 }
 </script>
 

@@ -15,16 +15,16 @@ exports.main = async (event, context) => {
     _.and([{
       openid: openid
     }, {
-      createTime: _.gte(event.data.begin)
+      date: _.gte(event.data.begin)
     }, {
-      createTime: _.lte(event.data.end)
+      date: _.lte(event.data.end)
     }])
   ).get();
 
   let summary = {
     expend: 0,
     income: 0,
-    oilQuantity: 0,
+    oilTotal: 0,
     oilCost: 0,
     outputValue: 0
   }
@@ -34,14 +34,14 @@ exports.main = async (event, context) => {
   bills.map(b => {
     if (b.type === 1) {
       summary.expend += b.amount;
-      if (b.fee != 0) {
-        summary.oilQuantity += b.fee;
-        summary.oilCost += b.fee * b.rates;
+      if (b.total != 0) {
+        summary.oilTotal += b.total;
+        summary.oilCost += b.total * b.rates;
       }
     } else if (b.type === 2) {
       summary.income += b.amount;
-      if (b.fee != 0) {
-        summary.outputValue += b.fee * b.rates;
+      if (b.total != 0) {
+        summary.outputValue += b.total * b.rates;
       }
     }
   })

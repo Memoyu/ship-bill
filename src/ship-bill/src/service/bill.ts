@@ -11,14 +11,14 @@ export type Bill = {
   _id: string
   openid: string
   type: number
-  fee: number
+  total: number
   rates: number
   amount: number
   address: string
   counter: string
   sub_counter: string
   remark: string
-  date: string
+  date: number
   categorys: BillCategory[]
   updateTime: number
   createTime: number
@@ -38,7 +38,7 @@ export type BillsWithTotal = {
 
 export type CreateBill = {
   type: number
-  fee: number
+  total: number
   rates: number
   amount: number
   address: string
@@ -50,7 +50,8 @@ export type CreateBill = {
 }
 
 export type UpdateBill = {
-  fee: number
+  _id: string
+  total: number
   rates: number
   amount: number
   address: string
@@ -61,15 +62,10 @@ export type UpdateBill = {
   categorys: BillCategory[]
 }
 
-export type HomeBillStore = {
-  summary: HomeBillSummary
-  reports: HomeBillReport[]
-}
-
 export type HomeBillSummary = {
   expend: number
   income: number
-  oilQuantity: number
+  oilTotal: number
   oilCost: number
   outputValue: number
 }
@@ -80,6 +76,17 @@ export type HomeBillReport = {
   expendCount: number
   incomeCount: number
   date: string
+}
+
+export type EditBillStore = {
+  add?: Bill // 新增的账单
+  delete?: Bill // 删除的账单
+  update?: UpdateBillStore // 更新的账单
+}
+
+export type UpdateBillStore = {
+  old: Bill
+  new: Bill
 }
 
 export async function getBill(id: string) {
@@ -111,6 +118,14 @@ export async function updateBill(bill: UpdateBill) {
     type,
     method: 'update',
     data: bill,
+  })
+}
+
+export async function deleteBill(id: string) {
+  return request<Bill>({
+    type,
+    method: 'delete',
+    data: id,
   })
 }
 

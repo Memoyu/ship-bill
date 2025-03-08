@@ -15,9 +15,9 @@ exports.main = async (event, context) => {
     _.and([{
       openid: openid
     }, {
-      createTime: _.gte(event.data.begin)
+      date: _.gte(event.data.begin)
     }, {
-      createTime: _.lte(event.data.end)
+      date: _.lte(event.data.end)
     }])
   ).get();
 
@@ -26,7 +26,7 @@ exports.main = async (event, context) => {
   let dateList = [];
   let startTime = new Date(event.data.begin);
   let endTime = new Date(event.data.end);
-  console.log('时间戳', startTime, endTime)
+  // console.log('时间戳', startTime, endTime)
   while ((endTime.getTime() - startTime.getTime()) >= 0) {
     var year = startTime.getFullYear();
     var month = startTime.getMonth() + 1 < 10 ? '0' + (startTime.getMonth() + 1) : startTime.getMonth() + 1;
@@ -42,14 +42,14 @@ exports.main = async (event, context) => {
   if (!bills) return reports;
 
   dateList.map(d => {
-    let begin = new Date(d).valueOf();
+    let begin = new Date(d + ' 00:00:00').valueOf();
     let end = new Date(d + ' 23:59:59').valueOf();
     let expend = 0;
     let income = 0;
     let expendCount = 0;
     let incomeCount = 0;
     bills.map(b => {
-      if (b.createTime >= begin && b.createTime <= end) {
+      if (b.date >= begin && b.date <= end) {
         if (b.type === 1) {
           expend += b.amount;
           expendCount += 1;

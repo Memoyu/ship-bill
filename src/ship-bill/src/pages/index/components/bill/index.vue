@@ -32,11 +32,18 @@
           </view>
         </view>
       </view>
-      <wd-cell-group border>
-        <view v-for="bill in bills" :key="bill._id" class="m-2 p-2 bg-slate-100 rounded-md">
-          <BillItem :bill="bill" />
-        </view>
-      </wd-cell-group>
+
+      <view v-if="bills.length > 0" class="pb-1">
+        <wd-cell-group border>
+          <view v-for="bill in bills" :key="bill._id" class="my-3 mx-2 p-2 bg-slate-100 rounded-md">
+            <BillItem :bill="bill" />
+          </view>
+          <!-- <view class="h-1" /> -->
+        </wd-cell-group>
+      </view>
+      <view v-else class="h-full flex items-center">
+        <wd-status-tip image="content" tip="暂无账单" />
+      </view>
     </view>
   </wd-floating-panel>
 </template>
@@ -71,6 +78,7 @@ watch(
   () => props.date,
   (nweDate) => {
     currentDate.value = nweDate
+    bills.value = []
     getBillList()
   },
 )
@@ -108,10 +116,14 @@ const handleHeightChangePanel = ({ height }) => {
 const getBillList = () => {
   const t = type.value === '全部' ? 0 : getBillType(type.value)
 
+  const begin = dayjs(currentDate.value)
+  const end = begin.add(1, 'day').add(-1, 'second')
+  // console.log('获取账单列表', begin, end)
+
   getBills({
     type: t,
-    begin: new Date(currentDate.value).valueOf(),
-    end: new Date(currentDate.value + ' 23:59:59').valueOf(),
+    begin: begin.valueOf(),
+    end: end.valueOf(),
   }).then((res) => {
     sourceBills.value = res.items
     bills.value = res.items
