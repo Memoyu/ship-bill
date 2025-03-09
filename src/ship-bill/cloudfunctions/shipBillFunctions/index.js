@@ -21,6 +21,8 @@ const getBills = require('./bill/list/index');
 const getBill = require('./bill/get/index');
 const getHomeBillSummary = require('./bill/home/summary');
 const getHomeBillReport = require('./bill/home/report');
+const getReportBillQuery = require('./bill/report/query');
+const getReportBillExport = require('./bill/report/export');
 
 cloud.init({
   env: cloud.DYNAMIC_CURRENT_ENV
@@ -72,6 +74,10 @@ const mapBill = async (event, context) => {
       return await getHomeBillSummary.main(event, context);
     case 'home_report':
       return await getHomeBillReport.main(event, context);
+    case 'report_query':
+      return await getReportBillQuery.main(event, context);
+    case 'report_export':
+      return await getReportBillExport.main(event, context);
     default:
       throw new Error("未定义Bill method:" + event.method);
   }

@@ -41,7 +41,7 @@ exports.main = async (event, context) => {
     } else if (b.type === 2) {
       summary.income += b.amount;
       if (b.total != 0) {
-        summary.outputValue += b.total * b.rates;
+        summary.outputValue += b.total;
       }
     }
   })

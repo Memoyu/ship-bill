@@ -61,7 +61,7 @@
 
       <view v-if="listBills.length > 0">
         <view v-for="bill in listBills" :key="bill._id" class="my-3 p-2 bg-slate-100 rounded-md">
-          <BillItem :bill="bill" />
+          <BillItem :bill="bill" :show-date="true" />
         </view>
       </view>
       <view v-else class="flex items-center">

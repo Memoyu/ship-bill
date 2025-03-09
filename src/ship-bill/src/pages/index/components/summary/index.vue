@@ -49,12 +49,11 @@ watch(
   (add) => {
     if (!add) return
     if (add.date >= beginDate && add.date <= endDate) {
-      const totalRates = -(add.total * add.rates)
       summary.value.expend += isExpendType(add.type) ? add.amount : 0
-      summary.value.income += isExpendType(add.type) ? add.amount : 0
-      summary.value.oilTotal += isIncomeType(add.type) ? add.total : 0
-      summary.value.oilCost += isIncomeType(add.type) ? totalRates : 0
-      summary.value.outputValue += isExpendType(add.type) ? totalRates : 0
+      summary.value.income += isIncomeType(add.type) ? add.amount : 0
+      summary.value.oilTotal += isExpendType(add.type) ? add.total : 0
+      summary.value.oilCost += isExpendType(add.type) ? add.total * add.rates : 0
+      summary.value.outputValue += isIncomeType(add.type) ? add.total : 0
     }
   },
   { immediate: true, deep: true },
@@ -66,12 +65,11 @@ watch(
   (del) => {
     if (!del) return
     if (del.date >= beginDate && del.date <= endDate) {
-      const totalRates = -(del.total * del.rates)
-      summary.value.expend -= isIncomeType(del.type) ? del.amount : 0
-      summary.value.income -= isExpendType(del.type) ? del.amount : 0
-      summary.value.oilTotal -= isIncomeType(del.type) ? del.total : 0
-      summary.value.oilCost -= isIncomeType(del.type) ? totalRates : 0
-      summary.value.outputValue -= isExpendType(del.type) ? totalRates : 0
+      summary.value.expend -= isExpendType(del.type) ? del.amount : 0
+      summary.value.income -= isIncomeType(del.type) ? del.amount : 0
+      summary.value.oilTotal -= isExpendType(del.type) ? del.total : 0
+      summary.value.oilCost -= isExpendType(del.type) ? del.total * del.rates : 0
+      summary.value.outputValue -= isIncomeType(del.type) ? del.total : 0
     }
   },
   { immediate: true, deep: true },
@@ -118,7 +116,7 @@ watch(
     summary.value.income += isIncomeType(newBill.type) ? amount : 0
     summary.value.oilTotal += isExpendType(newBill.type) ? total : 0
     summary.value.oilCost += isExpendType(newBill.type) ? totalRates : 0
-    summary.value.outputValue += isIncomeType(newBill.type) ? totalRates : 0
+    summary.value.outputValue += isIncomeType(newBill.type) ? total : 0
   },
   { immediate: true, deep: true },
 )
