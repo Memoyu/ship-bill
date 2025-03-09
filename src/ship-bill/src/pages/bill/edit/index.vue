@@ -201,7 +201,7 @@ defineOptions({
 
 const expendColor = getCurrentInstance().appContext.config.globalProperties.expendColor
 const incomeColor = getCurrentInstance().appContext.config.globalProperties.incomeColor
-const { safeAreaInsets } = uni.getSystemInfoSync()
+const { safeAreaInsets } = uni.getWindowInfo()
 const { configState } = useConfigStore()
 const { addBillAc, deleteBillAc, updateBillAc } = useEditBillStore()
 const message = useMessage()
@@ -422,7 +422,7 @@ const handleClickDelete = () => {
 }
 
 const getBillDetail = (id: string) => {
-  console.log('获取账单详情')
+  // console.log('获取账单详情')
   getBill(id).then((res) => {
     bill.value = res
     sourceBill.value = { ...res }

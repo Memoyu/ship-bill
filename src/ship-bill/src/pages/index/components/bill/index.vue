@@ -33,9 +33,13 @@
         </view>
       </view>
 
-      <view v-if="bills.length > 0" class="pb-1">
+      <view v-if="listBills.length > 0" class="pb-1">
         <wd-cell-group border>
-          <view v-for="bill in bills" :key="bill._id" class="my-3 mx-2 p-2 bg-slate-100 rounded-md">
+          <view
+            v-for="bill in listBills"
+            :key="bill._id"
+            class="my-3 mx-2 p-2 bg-slate-100 rounded-md"
+          >
             <BillItem :bill="bill" />
           </view>
           <!-- <view class="h-1" /> -->
@@ -50,14 +54,17 @@
 
 <script lang="ts" setup>
 import { Bill, getBills } from '@/service'
-import { getBillType } from '@/utils/bill'
+import { getBillType, isExpendType, isIncomeType } from '@/utils/bill'
 import dayjs from 'dayjs'
 import BillItem from '@/components/bill-item/index.vue'
+import { useEditBillStore } from '@/store'
 
 const props = defineProps<{ show: boolean; date: string }>()
 const emits = defineEmits<{
   (e: 'update:show', value: boolean): void
 }>()
+
+const { editBillState } = useEditBillStore()
 
 const expendColor = getCurrentInstance().appContext.config.globalProperties.expendColor
 const incomeColor = getCurrentInstance().appContext.config.globalProperties.incomeColor
@@ -65,30 +72,81 @@ const types = ref(['全部', '支出', '收入'])
 const type = ref('全部')
 const minHeight = 80
 const panelHeight = ref<number>(minHeight)
-const { windowHeight } = uni.getSystemInfoSync()
+const { windowHeight } = uni.getWindowInfo()
+
 const maxHeight = ref<number>(0)
 const anchors = ref<number[]>([])
 const currentDate = ref(dayjs().format('YYYY-MM-DD'))
 const sourceBills = ref<Bill[]>([])
-const bills = ref<Bill[]>([])
+const listBills = ref<Bill[]>([])
 const expend = ref<number>(0)
 const income = ref<number>(0)
-
-watch(
-  () => props.date,
-  (nweDate) => {
-    currentDate.value = nweDate
-    bills.value = []
-    getBillList()
-  },
-)
 
 watch(
   () => props.show,
   (nweShow) => {
     if (nweShow) {
       panelHeight.value = maxHeight.value
+      if (currentDate.value !== props.date) {
+        currentDate.value = props.date
+        getBillList()
+      }
     }
+  },
+)
+
+// 监听账单新增
+watch(
+  () => editBillState.add,
+  (add) => {
+    const date = dayjs(add.date).format('YYYY-MM-DD')
+    // console.log('add date', date)
+    if (date === currentDate.value) {
+      listBills.value.unshift(add)
+      sourceBills.value.unshift(add)
+      expend.value += isExpendType(add.type) ? add.amount : 0
+      income.value += isIncomeType(add.type) ? add.amount : 0
+    }
+  },
+)
+
+// 监听账单删除
+watch(
+  () => editBillState.delete,
+  (del) => {
+    const date = dayjs(del.date).format('YYYY-MM-DD')
+    // console.log('del date', date)
+    if (date === currentDate.value) {
+      listBills.value = listBills.value.filter((b) => b._id !== del._id)
+      sourceBills.value = sourceBills.value.filter((b) => b._id !== del._id)
+      expend.value -= isExpendType(del.type) ? del.amount : 0
+      income.value -= isIncomeType(del.type) ? del.amount : 0
+    }
+  },
+)
+
+// 监听账单更新
+watch(
+  () => editBillState.update,
+  (update) => {
+    const source = [...sourceBills.value]
+    const list = [...listBills.value]
+
+    const indexOfSource = source.findIndex((b) => b._id === update.new._id)
+    if (indexOfSource < -1) return
+    // console.log('bill update', indexOfSource, source)
+    const amount = update.new.amount - update.old.amount
+    expend.value += isExpendType(update.new.type) ? amount : 0
+    income.value += isIncomeType(update.new.type) ? amount : 0
+    // 替换全部账单数据
+    source[indexOfSource] = update.new
+    sourceBills.value = source
+
+    // 替换当前展示数据
+    const indexOf = list.findIndex((b) => b._id === update.new._id)
+    if (indexOf < -1) return
+    list[indexOf] = update.new
+    listBills.value = list
   },
 )
 
@@ -101,9 +159,9 @@ onLoad(() => {
 const handleChangeType = () => {
   // console.log(type.value)
   if (type.value === '全部') {
-    bills.value = sourceBills.value
+    listBills.value = [...sourceBills.value]
   } else {
-    bills.value = sourceBills.value.filter((item) => {
+    listBills.value = sourceBills.value.filter((item) => {
       return item.type === getBillType(type.value)
     })
   }
@@ -114,19 +172,21 @@ const handleHeightChangePanel = ({ height }) => {
 }
 
 const getBillList = () => {
+  listBills.value = []
+  expend.value = 0
+  income.value = 0
+
   const t = type.value === '全部' ? 0 : getBillType(type.value)
 
   const begin = dayjs(currentDate.value)
   const end = begin.add(1, 'day').add(-1, 'second')
-  // console.log('获取账单列表', begin, end)
-
   getBills({
     type: t,
     begin: begin.valueOf(),
     end: end.valueOf(),
   }).then((res) => {
     sourceBills.value = res.items
-    bills.value = res.items
+    listBills.value = [...res.items]
     expend.value = res.expend
     income.value = res.income
   })

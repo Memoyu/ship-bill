@@ -61,7 +61,7 @@ const emits = defineEmits<{
 
 const expendColor = getCurrentInstance().appContext.config.globalProperties.expendColor
 const incomeColor = getCurrentInstance().appContext.config.globalProperties.incomeColor
-const { windowHeight } = uni.getSystemInfoSync()
+const { windowHeight } = uni.getWindowInfo()
 const beginDate = dayjs().startOf('month').valueOf()
 const endDate = dayjs().endOf('month').valueOf()
 

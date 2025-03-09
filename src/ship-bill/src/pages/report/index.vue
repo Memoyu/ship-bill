@@ -48,7 +48,7 @@ defineOptions({
   name: 'Report',
 })
 
-const { windowHeight, safeAreaInsets } = uni.getSystemInfoSync()
+const { windowHeight, safeAreaInsets } = uni.getWindowInfo()
 const tableHeight = ref<string>('400')
 
 const dataList = ref<any[]>([

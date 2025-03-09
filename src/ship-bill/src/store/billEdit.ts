@@ -21,10 +21,7 @@ export const useEditBillStore = defineStore('edit-bill', () => {
       old: oldBill,
       new: newBill,
     }
-    console.log('update bill', editBillState.update)
-    setTimeout(() => {
-      console.log('update bill timeout', editBillState.update)
-    }, 3000)
+    // console.log('update bill', editBillState.update)
   }
 
   return {
