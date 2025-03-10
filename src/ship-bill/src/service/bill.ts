@@ -62,6 +62,42 @@ export type UpdateBill = {
   categorys: BillCategory[]
 }
 
+export type ReportBill = {
+  date: string
+  bang: number
+  fengGui: number
+  yiTi: number
+  jiaBan: number
+  chaoShi: number
+  buTie: number
+  yaYe: number
+  chaoZhong: number
+  tiKong: number
+  tiZhong: number
+  haunKong: number
+  haunZhong: number
+  duGui: number
+  tingChe: number
+  gaoSu: number
+  naioSu: number
+  tiGui: number
+  xiGui: number
+  huanGui: number
+  yanHuanGui: number
+  xiuXiang: number
+  buTai: number
+  diaoGui: number
+  daDan: number
+  fengTiao: number
+  xunGui: number
+  xiuChe: number
+  other: number
+  oilTotal: number
+  oilAmount: number
+  outputValue: number
+  commission: number
+}
+
 export type HomeBillSummary = {
   expend: number
   income: number
@@ -141,6 +177,22 @@ export async function getHomeBillReport(begin: number, end: number) {
   return request<HomeBillReport[]>({
     type,
     method: 'home_report',
+    data: { begin, end },
+  })
+}
+
+export async function getReportBillQuery(begin: number, end: number) {
+  return request<ReportBill[]>({
+    type,
+    method: 'report_query',
+    data: { begin, end },
+  })
+}
+
+export async function getReportBillExport(begin: number, end: number) {
+  return request<any>({
+    type,
+    method: 'report_export',
     data: { begin, end },
   })
 }
