@@ -8,7 +8,7 @@
 }
 </route>
 <template>
-  <view class="bg-slate-50">
+  <view class="bg-indigo-100">
     <User />
     <view class="px-4">
       <Summary />

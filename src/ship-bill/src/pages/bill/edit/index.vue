@@ -406,9 +406,6 @@ const handleClickDelete = () => {
       title: '提示',
     })
     .then(() => {
-      uni.showLoading({
-        title: '删除中',
-      })
       deleteBill(billId.value)
         .then((res) => {
           deleteBillAc(sourceBill.value)
@@ -417,9 +414,6 @@ const handleClickDelete = () => {
         })
         .catch((err) => {
           console.log(err)
-        })
-        .finally(() => {
-          uni.hideLoading()
         })
     })
 }

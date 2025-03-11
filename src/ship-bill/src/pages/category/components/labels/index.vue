@@ -41,7 +41,7 @@
       </view>
       <view class="w-full flex justify-between absolute bottom-2">
         <wd-button type="info" @click="handleClosePopup">取消</wd-button>
-        <wd-button @click="handleClickSaveCategory">保存</wd-button>
+        <wd-button :loading="saveLoading" @click="handleClickSaveCategory">保存</wd-button>
       </view>
     </wd-popup>
   </view>
@@ -60,6 +60,7 @@ const message = useMessage()
 const show = ref<boolean>(false)
 const categoryName = ref<string>('')
 const current = ref<Category>()
+const saveLoading = ref<boolean>(false)
 
 const filterCategories = computed(() => {
   // console.log('账单类型变更', props.type)
@@ -94,9 +95,6 @@ const handleClickDeleteCategory = (category) => {
       title: '提示',
     })
     .then(() => {
-      uni.showLoading({
-        title: '删除中',
-      })
       deleteCategory(category._id)
         .then((res) => {
           const categories = [...props.categories]
@@ -105,9 +103,6 @@ const handleClickDeleteCategory = (category) => {
         })
         .catch((e) => {
           console.log(e)
-        })
-        .finally(() => {
-          uni.hideLoading()
         })
     })
 }
@@ -129,36 +124,36 @@ const handleClickSaveCategory = () => {
     return
   }
 
-  uni.showLoading({
-    title: '保存中',
-  })
-  if (current.value) {
-    updateCategory({ _id: current.value._id, name: categoryName.value })
-      .then((res) => {
-        const categories = [...props.categories]
-        const filters = categories.filter((c) => c._id === current.value._id)
-        filters[0].name = res.name
-        emits('update:categories', categories)
-        show.value = false
-        uni.hideLoading()
-      })
-      .catch((e) => {
-        uni.hideLoading()
-        console.log(e)
-      })
-  } else {
-    createCategory({ type: props.type, name: categoryName.value })
-      .then((res) => {
-        const categories = [...props.categories]
-        categories.push(res)
-        emits('update:categories', categories)
-        show.value = false
-        uni.hideLoading()
-      })
-      .catch((e) => {
-        uni.hideLoading()
-        console.log(e)
-      })
+  saveLoading.value = true
+  try {
+    if (current.value) {
+      updateCategory({ _id: current.value._id, name: categoryName.value })
+        .then((res) => {
+          const categories = [...props.categories]
+          const filters = categories.filter((c) => c._id === current.value._id)
+          filters[0].name = res.name
+          emits('update:categories', categories)
+          show.value = false
+        })
+        .catch((e) => {
+          console.log(e)
+        })
+    } else {
+      createCategory({ type: props.type, name: categoryName.value })
+        .then((res) => {
+          const categories = [...props.categories]
+          categories.push(res)
+          emits('update:categories', categories)
+          show.value = false
+        })
+        .catch((e) => {
+          console.log(e)
+        })
+    }
+  } catch (error) {
+    console.log(error)
+  } finally {
+    saveLoading.value = false
   }
 }
 </script>

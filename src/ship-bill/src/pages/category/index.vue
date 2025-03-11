@@ -46,17 +46,11 @@ const type = ref<number>(1)
 const categories = ref<Category[]>([])
 
 onLoad(() => {
-  uni.showLoading({
-    title: '加载中',
-  })
-
   getCategories()
     .then((res) => {
       categories.value = res
-      uni.hideLoading()
     })
     .catch((e) => {
-      uni.hideLoading()
       console.log(e)
     })
 })
