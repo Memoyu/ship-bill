@@ -16,10 +16,10 @@ export type Bill = {
   amount: number
   address: string
   counter: string
-  sub_counter: string
+  subCounter: string
   remark: string
   date: number
-  categorys: BillCategory[]
+  categories: BillCategory[]
   updateTime: number
   createTime: number
 }
@@ -43,10 +43,10 @@ export type CreateBill = {
   amount: number
   address: string
   counter: string
-  sub_counter: string
+  subCounter: string
   remark: string
   date: number
-  categorys: BillCategory[]
+  categories: BillCategory[]
 }
 
 export type UpdateBill = {
@@ -56,14 +56,17 @@ export type UpdateBill = {
   amount: number
   address: string
   counter: string
-  sub_counter: string
+  subCounter: string
   remark: string
   date: number
-  categorys: BillCategory[]
+  categories: BillCategory[]
 }
 
 export type ReportBill = {
   date: string
+  address: string
+  counter: string
+  subCounter: string
   bang: number
   fengGui: number
   yiTi: number
@@ -96,6 +99,7 @@ export type ReportBill = {
   oilAmount: number
   outputValue: number
   commission: number
+  remark: string
 }
 
 export type HomeBillSummary = {

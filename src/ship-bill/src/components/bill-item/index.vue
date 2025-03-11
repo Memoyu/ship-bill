@@ -46,10 +46,10 @@ const getBillColor = () => {
 }
 
 const getBillCategoryText = () => {
-  const categorys = props.bill.categorys.map((item) => {
+  const categories = props.bill.categories.map((item) => {
     return item.name
   })
-  return categorys.join(', ')
+  return categories.join(', ')
 }
 
 const getBillFeeText = () => {

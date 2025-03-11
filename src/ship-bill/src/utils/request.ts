@@ -29,7 +29,7 @@ const isIgnore = (type: string, method: string) => {
 const http = <T>(options: CallFunctionOptions) => {
   return new Promise<T>((resolve, reject) => {
     // console.log('isLogined', isLogined(), isIgnore(options.type, options.method))
-    console.log('request type & method', options.type, options.method)
+    // console.log('request type & method', options.type, options.method)
     if (!isLogined() && !isIgnore(options.type, options.method)) return reject(new Error('未登录'))
 
     wx.cloud.callFunction({

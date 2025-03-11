@@ -91,7 +91,7 @@ const expendColor = getCurrentInstance().appContext.config.globalProperties.expe
 const incomeColor = getCurrentInstance().appContext.config.globalProperties.incomeColor
 const types = ref(['全部', '支出', '收入'])
 const type = ref('全部')
-const dates = ref<number[]>([dayjs().subtract(1, 'month').toDate().valueOf(), Date.now().valueOf()])
+const dates = ref<number[]>([dayjs().startOf('month').valueOf(), dayjs().endOf('month').valueOf()])
 
 const sourceBills = ref<Bill[]>([])
 const listBills = ref<Bill[]>([])

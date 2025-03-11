@@ -37,6 +37,9 @@
       <wd-table :data="reports" :height="tableHeight" :fixed-header="false">
         <wd-table-col prop="date" label="日期" align="center"></wd-table-col>
         <!-- 收入 -->
+        <wd-table-col prop="address" label="地址" :width="250"></wd-table-col>
+        <wd-table-col prop="counter" label="柜号1" :width="150"></wd-table-col>
+        <wd-table-col prop="subCounter" label="柜号2" :width="150"></wd-table-col>
         <wd-table-col prop="bang" label="磅费"></wd-table-col>
         <wd-table-col prop="fengGui" label="封柜费"></wd-table-col>
         <wd-table-col prop="yiTi" label="异提费"></wd-table-col>
@@ -72,6 +75,7 @@
         <wd-table-col prop="oilAmount" label="加油金额(元)"></wd-table-col>
         <wd-table-col prop="outputValue" label="产值"></wd-table-col>
         <wd-table-col prop="commission" label="提成"></wd-table-col>
+        <wd-table-col prop="remark" label="备注" :width="250"></wd-table-col>
       </wd-table>
       <!-- <wd-pagination
         custom-style="border: 1px solid #ececec;border-top:none"
@@ -97,13 +101,13 @@ defineOptions({
 
 const { windowHeight, safeAreaInsets } = uni.getWindowInfo()
 const tableHeight = ref<string>('400')
-const dates = ref<number[]>([dayjs().subtract(1, 'month').toDate().valueOf(), Date.now().valueOf()])
+const dates = ref<number[]>([dayjs().startOf('month').valueOf(), dayjs().endOf('month').valueOf()])
 
 const reports = ref<ReportBill[]>([])
-const page = ref<number>(1)
-const pageSize = ref<number>(10)
+// const page = ref<number>(1)
+// const pageSize = ref<number>(10)
 
-const total = ref<number>(reports.value.length)
+// const total = ref<number>(reports.value.length)
 // const paginationData = computed(() => {
 //   // 按页码和每页条数截取数据
 //   return reports.value.slice((page.value - 1) * pageSize.value, page.value * pageSize.value)

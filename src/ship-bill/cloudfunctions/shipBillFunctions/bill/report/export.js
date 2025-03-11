@@ -7,21 +7,24 @@ const getReportBillQuery = require('./query');
 cloud.init({
   env: cloud.DYNAMIC_CURRENT_ENV
 });
-const db = cloud.database();
 
 exports.main = async (event, context) => {
   let openid = wxctx.getOpenId();
   // 获取数据数据
   let res = await getReportBillQuery.main(event, context);
   let items = res ?? [];
+  if (items.length < 1) throw new Error("导出数据为空，导出失败");
 
-  let fileName = `exports/${openid}-${Math.floor(Math.random()*1000000000)}.xlsx`;
+  const begin = items[0].date;
+  const end = items[items.length - 1].date;
+
+  let fileName = `exports/${openid}-${begin}~${end}-${Math.floor(Math.random()*1000000000)}.xlsx`;
   //声明一个Excel表，表的名字用随机数产生
   let allRows = [];
   let row = [
-    '日期', '磅费', '封柜费', '异提费', '加班', '超时费', '补贴', '压夜', '超重费', '提空', '提重', '还空', '还重',
+    '日期', '地址', '柜号1', '柜号2', '磅费', '封柜费', '异提费', '加班', '超时费', '补贴', '压夜', '超重费', '提空', '提重', '还空', '还重',
     '渡柜', '停车费', '高速费', '尿素', '提柜费', '洗柜费', '换柜费', '验还柜', '修箱费', '补胎', '吊柜费', '打单费', '封条费', '薰柜费', '修车费',
-    '其它', '加油(升)', '加油金额(元)', '产值', '提成'
+    '其它', '加油(升)', '加油金额(元)', '产值', '提成', '备注'
   ]; //表格的属性，也就是表头说明对象
 
   allRows.push(row); //将此行数据添加到一个向表格中存数据的数组中
@@ -63,6 +66,10 @@ exports.main = async (event, context) => {
     let dataCols = [];
 
     dataCols.push(b.date);
+    dataCols.push(b.address);
+    dataCols.push(b.counter);
+    dataCols.push(b.subCounter);
+
     dataCols.push(b.bang);
     dataCols.push(b.fengGui);
     dataCols.push(b.yiTi);
@@ -95,6 +102,8 @@ exports.main = async (event, context) => {
     dataCols.push(b.oilAmount);
     dataCols.push(b.outputValue);
     dataCols.push(b.commission);
+
+    dataCols.push(b.remark);
 
     // 汇总
     bangTotal += b.bang;
@@ -134,6 +143,9 @@ exports.main = async (event, context) => {
   });
 
   allRows.push([
+    '',
+    '',
+    '',
     '汇总：',
     parseFloat((bangTotal).toFixed(2)),
     parseFloat((fengGuiTotal).toFixed(2)),
@@ -167,11 +179,26 @@ exports.main = async (event, context) => {
     parseFloat((oilAmountTotal).toFixed(2)),
     parseFloat((outputValueTotal).toFixed(2)),
     parseFloat((commissionTotal).toFixed(2)),
+    '',
   ])
 
+  const options = {
+    "!cols": [{
+      wch: 11
+    }, {
+      wch: 50
+    }, {
+      wch: 25
+    }, {
+      wch: 25
+    }], //列宽
+  };
+
+
   var buffer = xlsx.build([{
-    name: "bill-reports",
-    data: allRows
+    name: `${begin}~${end}`,
+    data: allRows,
+    options
   }]);
 
   //将表格存入到存储库中并返回文件ID

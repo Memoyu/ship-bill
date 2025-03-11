@@ -14,7 +14,7 @@
       fixed
       safeAreaInsetTop
       placeholder
-      title="账单"
+      :title="navbarTitle"
       left-text="返回"
       left-arrow
       @click-left="handleClickLeft"
@@ -105,7 +105,7 @@
             no-border
             size="large"
             type="text"
-            v-model="bill.sub_counter"
+            v-model="bill.subCounter"
             placeholder="例如: 1234567"
           />
           <wd-input
@@ -199,6 +199,8 @@ defineOptions({
   name: 'EditBill',
 })
 
+const navbarTitle = ref('新增账单')
+
 const expendColor = getCurrentInstance().appContext.config.globalProperties.expendColor
 const incomeColor = getCurrentInstance().appContext.config.globalProperties.incomeColor
 const { safeAreaInsets } = uni.getWindowInfo()
@@ -231,10 +233,10 @@ const bill = ref<CreateBill>({
   amount: 0,
   address: '',
   counter: '',
-  sub_counter: '',
+  subCounter: '',
   remark: '',
   date: dayjs(dayjs().format('YYYY-MM-DD')).valueOf(),
-  categorys: [],
+  categories: [],
 })
 const sourceBill = ref<Bill>()
 const pickCategoryShow = ref<boolean>(false)
@@ -282,6 +284,7 @@ onLoad((option) => {
     isModify.value = true
     billId.value = option.id
     getBillDetail(option.id)
+    navbarTitle.value = '编辑账单'
   }
 })
 
@@ -363,10 +366,10 @@ const handleClickSave = () => {
         amount: amountNum,
         address: bill.value.address,
         counter: bill.value.counter,
-        sub_counter: bill.value.sub_counter,
+        subCounter: bill.value.subCounter,
         remark: bill.value.remark,
         date: bill.value.date,
-        categorys: billCategories.value,
+        categories: billCategories.value,
       }).then((res) => {
         updateBillAc(sourceBill.value, res)
         uni.showToast({ icon: 'none', title: '保存成功' })
@@ -379,10 +382,10 @@ const handleClickSave = () => {
         amount: amountNum,
         address: bill.value.address,
         counter: bill.value.counter,
-        sub_counter: bill.value.sub_counter,
+        subCounter: bill.value.subCounter,
         remark: bill.value.remark,
         date: bill.value.date,
-        categorys: billCategories.value,
+        categories: billCategories.value,
       }).then((res) => {
         addBillAc(res)
         uni.showToast({ icon: 'none', title: '保存成功' })
@@ -429,7 +432,7 @@ const getBillDetail = (id: string) => {
     type.value = res.type === 1 ? '支出' : '收入'
     total.value = res.total
     if (res.total !== 0) rates.value = res.rates
-    billCategories.value = res.categorys
+    billCategories.value = res.categories
   })
 }
 </script>

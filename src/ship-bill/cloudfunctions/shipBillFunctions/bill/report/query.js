@@ -51,6 +51,9 @@ exports.main = async (event, context) => {
 
     let item = {
       date: d,
+      address: '',
+      counter: '',
+      subCounter: '',
       bang: 0,
       fengGui: 0,
       yiTi: 0,
@@ -83,13 +86,24 @@ exports.main = async (event, context) => {
       oilAmount: 0,
       outputValue: 0,
       commission: 0,
+      remark: ''
     }
+
+    let addresses = [];
+    let counters = [];
+    let subCounters = [];
+    let remarks = [];
 
     bills.map(b => {
       if (b.date >= begin && b.date <= end) {
-        if (b.categorys && b.categorys.length > 0) {
+        addresses.push(b.address);
+        counters.push(b.counter);
+        subCounters.push(b.subCounter);
+        remarks.push(b.remark);
+
+        if (b.categories && b.categories.length > 0) {
           if (b.type === 1) {
-            b.categorys.map(bc => {
+            b.categories.map(bc => {
               switch (bc.name) {
                 case '渡柜':
                   item.duGui += bc.total
@@ -145,7 +159,7 @@ exports.main = async (event, context) => {
             item.oilTotal += b.total;
             item.oilAmount += b.total * b.rates;
           } else if (b.type === 2) {
-            b.categorys.map(bc => {
+            b.categories.map(bc => {
               switch (bc.name) {
                 case '磅费':
                   item.bang += bc.total
@@ -197,6 +211,11 @@ exports.main = async (event, context) => {
     });
     item.oilAmount = parseFloat((item.oilAmount).toFixed(2));
     item.commission = parseFloat((item.commission).toFixed(2));
+    item.address = addresses.join('，');
+    item.counter = counters.join('，');
+    item.subCounter = subCounters.join('，');
+    item.remark = remarks.join('，');
+
     reports.push(item)
   });
 
