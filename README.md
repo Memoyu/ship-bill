@@ -1,7 +1,7 @@
 <div align="center"  style="height: 200;">
     <img  style="zoom:55%;" src="https://raw.githubusercontent.com/Memoyu/ship-bill/refs/heads/main/doc/ship-bill-page.png" />
 </div>
-基于uniapp + 微信云开发实现的运输行业账单记录
+基于uni-app + 微信云开发实现的运输行业账单记录app
 
 
 
