@@ -83,12 +83,6 @@
   "openid": ""
 }
 {
-  "type": 1,
-  "name": "加油",
-  "base": true,
-  "openid": ""
-}
-{
   "type": 2,
   "name": "磅费",
   "base": true,
