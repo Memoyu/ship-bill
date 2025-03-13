@@ -191,7 +191,7 @@ import {
   getBill,
   updateBill,
 } from '@/service'
-import { getBillType, isExpendString } from '@/utils/bill'
+import { getBillType, isExpendString, isIncomeString, isIncomeType } from '@/utils/bill'
 import { useConfigStore, useEditBillStore } from '@/store'
 import { useMessage } from 'wot-design-uni'
 
@@ -254,7 +254,11 @@ const amount = computed(() => {
   const categoryTotal = billCategories.value.map((item) => item.total).reduce((a, b) => a + b, 0)
   // console.log('总计', total.value, rates.value)
   const feeNum = isNaN(Number(total.value)) ? 0 : Number(total.value)
-  const ratesNum = isNaN(Number(rates.value)) ? 0 : Number(rates.value)
+  let ratesNum = isNaN(Number(rates.value)) ? 0 : Number(rates.value)
+  if (isIncomeString(type.value)) {
+    ratesNum = ratesNum * 0.01 // 提成按百分比算
+  }
+  // console.log(ratesNum)
   return (categoryTotal + feeNum * ratesNum).toString()
 })
 

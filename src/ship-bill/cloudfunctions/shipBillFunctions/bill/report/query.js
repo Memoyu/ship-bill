@@ -204,7 +204,7 @@ exports.main = async (event, context) => {
             });
 
             item.outputValue += b.total;
-            item.commission += b.total * b.rates;
+            item.commission += b.total * b.rates * 0.01; // 提成按百分比算
           }
         }
       }

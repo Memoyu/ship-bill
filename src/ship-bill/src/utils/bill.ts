@@ -15,3 +15,4 @@ export const getBillType = (type: string) => (isExpendString(type) ? 1 : 2)
  * 是否为支出
  */
 export const isExpendString = (type: string) => type === '支出'
+export const isIncomeString = (type: string) => type === '收入'
