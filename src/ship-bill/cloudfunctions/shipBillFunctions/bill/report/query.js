@@ -42,8 +42,13 @@ exports.main = async (event, context) => {
   }
 
   let reports = [];
+  // 构建汇总字段
+  let summary = {};
+  event.data.headers.forEach(h => {
+    if (!h.ignoreSummary)
+      summary[h.prop] = 0;
+  });
   let bills = res?.data ?? [];
-
 
   dateList.forEach(d => {
     let begin = new Date(d + ' 00:00:00').valueOf();
@@ -54,39 +59,11 @@ exports.main = async (event, context) => {
       address: '',
       counter: '',
       subCounter: '',
-      bang: 0,
-      fengGui: 0,
-      yiTi: 0,
-      jiaBan: 0,
-      chaoShi: 0,
-      buTie: 0,
-      yaYe: 0,
-      chaoZhong: 0,
-      tiKong: 0,
-      tiZhong: 0,
-      haunKong: 0,
-      haunZhong: 0,
-      duGui: 0,
-      tingChe: 0,
-      gaoSu: 0,
-      naioSu: 0,
-      tiGui: 0,
-      xiGui: 0,
-      huanGui: 0,
-      yanHuanGui: 0,
-      xiuXiang: 0,
-      buTai: 0,
-      diaoGui: 0,
-      daDan: 0,
-      fengTiao: 0,
-      xunGui: 0,
-      xiuChe: 0,
-      other: 0,
       oilTotal: 0,
       oilAmount: 0,
       outputValue: 0,
       commission: 0,
-      remark: ''
+      remark: '',
     }
 
     let addresses = [];
@@ -96,128 +73,58 @@ exports.main = async (event, context) => {
 
     bills.map(b => {
       if (b.date >= begin && b.date <= end) {
-        addresses.push(b.address);
-        counters.push(b.counter);
-        subCounters.push(b.subCounter);
-        remarks.push(b.remark);
+        if (b.address && b.address.length > 0)
+          addresses.push(b.address);
+        if (b.counters && b.counters.length > 0)
+          counters.push(b.counter);
+        if (b.subCounter && b.subCounter.length > 0)
+          subCounters.push(b.subCounter);
+        if (b.remark && b.remark.length > 0)
+          remarks.push(b.remark);
+        if (b.type === 1) {
+          item.oilTotal += b.total;
+          item.oilAmount += b.total * b.rates;
+        } else if (b.type === 2) {
+          item.outputValue += b.total;
+          item.commission += b.total * b.rates * 0.01; // 提成按百分比算
+        }
 
         if (b.categories && b.categories.length > 0) {
-          if (b.type === 1) {
-            b.categories.map(bc => {
-              switch (bc.name) {
-                case '渡柜':
-                  item.duGui += bc.total
-                  break;
-                case '停车费':
-                  item.tingChe += bc.total
-                  break;
-                case '高速费':
-                  item.gaoSu += bc.total
-                  break;
-                case '尿素':
-                  item.naioSu += bc.total
-                  break;
-                case '提柜费':
-                  item.tiGui += bc.total
-                  break;
-                case '洗柜费':
-                  item.xiGui += bc.total
-                  break;
-                case '换柜费':
-                  item.huanGui += bc.total
-                  break;
-                case '验还柜':
-                  item.yanHuanGui += bc.total
-                  break;
-                case '修箱费':
-                  item.xiuXiang += bc.total
-                  break;
-                case '补胎':
-                  item.buTai += bc.total
-                  break;
-                case '吊柜费':
-                  item.diaoGui += bc.total
-                  break;
-                case '打单费':
-                  item.daDan += bc.total
-                  break;
-                case '封条费':
-                  item.fengTiao += bc.total
-                  break;
-                case '薰柜费':
-                  item.xunGui += bc.total
-                  break;
-                case '修车费':
-                  item.xiuChe += bc.total
-                  break;
-                default:
-                  item.other += bc.total
-                  break;
-              }
-            });
-
-            item.oilTotal += b.total;
-            item.oilAmount += b.total * b.rates;
-          } else if (b.type === 2) {
-            b.categories.map(bc => {
-              switch (bc.name) {
-                case '磅费':
-                  item.bang += bc.total
-                  break;
-                case '封柜费':
-                  item.fengGui += bc.total
-                  break;
-                case '异提费':
-                  item.yiTi += bc.total
-                  break;
-                case '加班':
-                  item.jiaBan += bc.total
-                  break;
-                case '超时费':
-                  item.chaoShi += bc.total
-                  break;
-                case '补贴':
-                  item.buTie += bc.total
-                  break;
-                case '压夜':
-                  item.yaYe += bc.total
-                  break;
-                case '超重费':
-                  item.chaoZhong += bc.total
-                  break;
-                case '提空':
-                  item.tiKong += bc.total
-                  break;
-                case '提重':
-                  item.tiZhong += bc.total
-                  break;
-                case '还空':
-                  item.haunKong += bc.total
-                  break;
-                case '还重':
-                  item.haunZhong += bc.total
-                  break;
-                default:
-                  item.other += bc.total
-                  break;
-              }
-            });
-
-            item.outputValue += b.total;
-            item.commission += b.total * b.rates * 0.01; // 提成按百分比算
-          }
+          b.categories.map(bc => {
+            const p = 'prop_' + bc.categoryId;
+            if (item.hasOwnProperty(p)) {
+              item[p] += bc.total;
+            } else {
+              item[p] = bc.total;
+            }
+          });
         }
       }
     });
+
     item.oilAmount = parseFloat((item.oilAmount).toFixed(2));
     item.commission = parseFloat((item.commission).toFixed(2));
-    item.address = addresses.join('，');
-    item.counter = counters.join('，');
-    item.subCounter = subCounters.join('，');
-    item.remark = remarks.join('，');
+    item.address = addresses.join('\r\n');
+    item.counter = counters.join('\r\n');
+    item.subCounter = subCounters.join('\r\n');
+    item.remark = remarks.join('\r\n');
 
-    reports.push(item)
+    if (item.oilTotal > 0 || item.outputValue) {
+      reports.push(item)
+    }
   });
 
-  return reports;
+  reports.map(b => {
+    // 构建汇总数据
+    Object.keys(summary).forEach(key => {
+      const value = b[key] === undefined ? 0 : b[key];
+      summary[key] = parseFloat((summary[key] + value).toFixed(2));
+    });
+  });
+
+
+  return {
+    reports,
+    summary
+  };
 };

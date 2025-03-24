@@ -132,21 +132,42 @@ watch(
     const source = [...sourceBills.value]
     const list = [...listBills.value]
 
-    const indexOfSource = source.findIndex((b) => b._id === update.new._id)
-    if (indexOfSource < -1) return
-    // console.log('bill update', indexOfSource, source)
-    const amount = update.new.amount - update.old.amount
-    expend.value += isExpendType(update.new.type) ? amount : 0
-    income.value += isIncomeType(update.new.type) ? amount : 0
-    // 替换全部账单数据
-    source[indexOfSource] = update.new
-    sourceBills.value = source
+    const oldBill = update.old
+    const newBill = update.new
+    const id = newBill._id
 
-    // 替换当前展示数据
-    const indexOf = list.findIndex((b) => b._id === update.new._id)
-    if (indexOf < -1) return
-    list[indexOf] = update.new
-    listBills.value = list
+    const indexOfSource = source.findIndex((b) => b._id === id)
+    const date = dayjs(newBill.date).format('YYYY-MM-DD')
+    if (indexOfSource > -1) {
+      if (date === currentDate.value) {
+        const amount = newBill.amount - oldBill.amount
+        expend.value += isExpendType(newBill.type) ? amount : 0
+        income.value += isIncomeType(newBill.type) ? amount : 0
+
+        // 替换源账单数据
+        source[indexOfSource] = newBill
+        sourceBills.value = source
+      } else {
+        expend.value -= isExpendType(newBill.type) ? oldBill.amount : 0
+        income.value -= isIncomeType(newBill.type) ? oldBill.amount : 0
+
+        // 移除源账单数据
+        sourceBills.value.splice(indexOfSource, 1)
+      }
+
+      // 更细当前列表
+      handleChangeType()
+    } else {
+      if (date === currentDate.value) {
+        expend.value += isExpendType(newBill.type) ? newBill.amount : 0
+        income.value += isIncomeType(newBill.type) ? newBill.amount : 0
+        // 新增源账单数据
+        sourceBills.value.push(newBill)
+        sourceBills.value.sort((a, b) => a.date - b.date)
+
+        handleChangeType()
+      }
+    }
   },
 )
 

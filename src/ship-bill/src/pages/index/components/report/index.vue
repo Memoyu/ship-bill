@@ -73,14 +73,27 @@ watch(
   () => editBillState.add,
   (add) => {
     if (!add) return
-    if (add.date >= beginDate && add.date <= endDate) {
-      const date = dayjs(add.date).format('YYYY-MM-DD')
-      const indexOf = reports.value.findIndex((r) => r.date === date)
+    const date = dayjs(add.date).format('YYYY-MM-DD')
+    const indexOf = reports.value.findIndex((r) => r.date === date)
+
+    if (indexOf > -1) {
+      // 存在汇总项
       const bill = reports.value[indexOf]
       bill.expend += isExpendType(add.type) ? add.amount : 0
       bill.income += isIncomeType(add.type) ? add.amount : 0
       bill.expendCount += isExpendType(add.type) ? 1 : 0
       bill.incomeCount += isIncomeType(add.type) ? 1 : 0
+    } else {
+      // 不存在汇总项
+      reports.value.push({
+        date,
+        expend: isExpendType(add.type) ? add.amount : 0,
+        income: isIncomeType(add.type) ? add.amount : 0,
+        expendCount: isExpendType(add.type) ? 1 : 0,
+        incomeCount: isIncomeType(add.type) ? 1 : 0,
+      })
+      // 排序
+      reports.value.sort((a, b) => Date.parse(a.date) - Date.parse(b.date))
     }
   },
 )
@@ -90,14 +103,20 @@ watch(
   () => editBillState.delete,
   (del) => {
     if (!del) return
-    if (del.date >= beginDate && del.date <= endDate) {
-      const date = dayjs(del.date).format('YYYY-MM-DD')
-      const indexOf = reports.value.findIndex((r) => r.date === date)
+    const date = dayjs(del.date).format('YYYY-MM-DD')
+    const indexOf = reports.value.findIndex((r) => r.date === date)
+
+    if (indexOf > -1) {
       const bill = reports.value[indexOf]
       bill.expend -= isExpendType(del.type) ? del.amount : 0
       bill.income -= isIncomeType(del.type) ? del.amount : 0
       bill.expendCount -= isExpendType(del.type) ? 1 : 0
       bill.incomeCount -= isIncomeType(del.type) ? 1 : 0
+
+      // 如果汇总项为0，就删除该项
+      if (bill.expend === 0 && bill.income === 0) {
+        reports.value.splice(indexOf, 1)
+      }
     }
   },
 )
@@ -124,28 +143,49 @@ watch(
       bill.expend += isExpendType(newBill.type) ? amount : 0
       bill.income += isIncomeType(newBill.type) ? amount : 0
     } else {
+      // 处理旧数据对应日期的汇总项
       const indexOfOld = reports.value.findIndex(
         (r) => r.date === dayjs(oldBill.date).format('YYYY-MM-DD'),
       )
       if (indexOfOld > -1) {
+        // 存在旧汇总项
         amount = oldBill.amount
         const bill = reports.value[indexOfOld]
         bill.expend -= isExpendType(oldBill.type) ? amount : 0
         bill.income -= isIncomeType(oldBill.type) ? amount : 0
         bill.expendCount -= isExpendType(oldBill.type) ? 1 : 0
         bill.incomeCount -= isIncomeType(oldBill.type) ? 1 : 0
-      }
-      const indexOfNew = reports.value.findIndex(
-        (r) => r.date === dayjs(newBill.date).format('YYYY-MM-DD'),
-      )
 
-      if (indexOfNew > -1) {
-        amount = newBill.amount
-        const bill = reports.value[indexOfNew]
-        bill.expend += isExpendType(newBill.type) ? amount : 0
-        bill.income += isIncomeType(newBill.type) ? amount : 0
-        bill.expendCount += isExpendType(newBill.type) ? 1 : 0
-        bill.incomeCount += isIncomeType(newBill.type) ? 1 : 0
+        // 如果汇总项为0，就删除该项
+        if (bill.expend === 0 && bill.income === 0) {
+          reports.value.splice(indexOfOld, 1)
+        }
+      }
+
+      // 处理新数据对应日期的汇总项
+      const date = dayjs(newBill.date).format('YYYY-MM-DD')
+      const indexOfNew = reports.value.findIndex((r) => r.date === date)
+      if (newBill.date >= beginDate && newBill.date <= endDate) {
+        if (indexOfNew > -1) {
+          // 存在旧汇总项
+          amount = newBill.amount
+          const bill = reports.value[indexOfNew]
+          bill.expend += isExpendType(newBill.type) ? amount : 0
+          bill.income += isIncomeType(newBill.type) ? amount : 0
+          bill.expendCount += isExpendType(newBill.type) ? 1 : 0
+          bill.incomeCount += isIncomeType(newBill.type) ? 1 : 0
+        } else {
+          // 不存在旧汇总项
+          reports.value.push({
+            date,
+            expend: isExpendType(newBill.type) ? newBill.amount : 0,
+            income: isIncomeType(newBill.type) ? newBill.amount : 0,
+            expendCount: isExpendType(newBill.type) ? 1 : 0,
+            incomeCount: isIncomeType(newBill.type) ? 1 : 0,
+          })
+          // 排序
+          reports.value.sort((a, b) => Date.parse(a.date) - Date.parse(b.date))
+        }
       }
     }
   },

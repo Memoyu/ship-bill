@@ -59,14 +59,15 @@ exports.main = async (event, context) => {
         }
       }
     })
-
-    reports.push({
-      date: d,
-      expend,
-      income,
-      expendCount,
-      incomeCount
-    })
+    if (expend > 0 || income > 0) {
+      reports.push({
+        date: d,
+        expend,
+        income,
+        expendCount,
+        incomeCount
+      });
+    }
   })
 
   return reports;
