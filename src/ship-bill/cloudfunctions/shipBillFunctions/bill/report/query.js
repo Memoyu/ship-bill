@@ -75,7 +75,7 @@ exports.main = async (event, context) => {
       if (b.date >= begin && b.date <= end) {
         if (b.address && b.address.length > 0)
           addresses.push(b.address);
-        if (b.counters && b.counters.length > 0)
+        if (b.counter && b.counter.length > 0)
           counters.push(b.counter);
         if (b.subCounter && b.subCounter.length > 0)
           subCounters.push(b.subCounter);
@@ -104,10 +104,10 @@ exports.main = async (event, context) => {
 
     item.oilAmount = parseFloat((item.oilAmount).toFixed(2));
     item.commission = parseFloat((item.commission).toFixed(2));
-    item.address = addresses.join('\r\n');
-    item.counter = counters.join('\r\n');
-    item.subCounter = subCounters.join('\r\n');
-    item.remark = remarks.join('\r\n');
+    item.address = addresses.join('\n');
+    item.counter = counters.join('\n');
+    item.subCounter = subCounters.join('\n');
+    item.remark = remarks.join('\n');
 
     if (item.oilTotal > 0 || item.outputValue) {
       reports.push(item)
