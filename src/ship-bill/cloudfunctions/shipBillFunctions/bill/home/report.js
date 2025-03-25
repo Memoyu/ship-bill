@@ -40,7 +40,8 @@ exports.main = async (event, context) => {
   let reports = [];
   let bills = res?.data;
   if (!bills) return reports;
-
+  // 反转一下日期
+  dateList = dateList.reverse();
   dateList.map(d => {
     let begin = new Date(d + ' 00:00:00').valueOf();
     let end = new Date(d + ' 23:59:59').valueOf();

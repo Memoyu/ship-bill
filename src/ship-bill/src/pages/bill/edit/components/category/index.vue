@@ -117,7 +117,7 @@ const handleClickCategoryItem = (item: Category) => {
   billCategory.value = {
     categoryId: item._id,
     name: item.name,
-    total: 0,
+    total: billCategory.value.total,
   }
 }
 

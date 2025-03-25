@@ -66,6 +66,7 @@ exports.main = async (event, context) => {
       remark: '',
     }
 
+    let amount = 0;
     let addresses = [];
     let counters = [];
     let subCounters = [];
@@ -73,6 +74,7 @@ exports.main = async (event, context) => {
 
     bills.map(b => {
       if (b.date >= begin && b.date <= end) {
+        amount += b.amount;
         if (b.address && b.address.length > 0)
           addresses.push(b.address);
         if (b.counter && b.counter.length > 0)
@@ -109,7 +111,7 @@ exports.main = async (event, context) => {
     item.subCounter = subCounters.join('\n');
     item.remark = remarks.join('\n');
 
-    if (item.oilTotal > 0 || item.outputValue) {
+    if (amount > 0) {
       reports.push(item)
     }
   });

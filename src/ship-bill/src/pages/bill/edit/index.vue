@@ -156,7 +156,7 @@
       <view class="h-[128rpx]" />
     </view>
     <view class="w-full absolute bottom-5">
-      <view class="mx-4 flex justify-between">
+      <view :class="['mx-4', 'flex', isModify ? 'justify-between' : 'justify-center']">
         <wd-button
           size="large"
           :loading="saveLoading"
@@ -217,8 +217,6 @@ const ratesUnit = ref('元')
 
 const oilPrices = configState.oilPrices === 0 ? '' : configState.oilPrices
 const commission = configState.commission === 0 ? '' : configState.commission
-const total = ref<number | ''>('')
-const rates = ref<number | ''>(oilPrices)
 const expendFee = ref<number | ''>('')
 const expendRates = ref<number | ''>(oilPrices)
 const incomeFee = ref<number | ''>('')
@@ -244,22 +242,52 @@ const types = ref(['支出', '收入'])
 const type = ref('支出')
 const saveLoading = ref<boolean>(false)
 
-const billCategories = ref<BillCategory[]>([])
 const expendCategories = ref<BillCategory[]>([])
 const incomeCategories = ref<BillCategory[]>([])
 const inputCategory = ref<BillCategory>()
 const inputCategoryIndex = ref<number>(-1)
 
 const amount = computed(() => {
-  const categoryTotal = billCategories.value.map((item) => item.total).reduce((a, b) => a + b, 0)
-  // console.log('总计', total.value, rates.value)
-  const feeNum = isNaN(Number(total.value)) ? 0 : Number(total.value)
-  let ratesNum = isNaN(Number(rates.value)) ? 0 : Number(rates.value)
-  if (isIncomeString(type.value)) {
-    ratesNum = ratesNum * 0.01 // 提成按百分比算
-  }
-  // console.log(ratesNum)
-  return (categoryTotal + feeNum * ratesNum).toString()
+  return computedAmount(type.value).toString()
+})
+
+const total = computed<number | ''>({
+  get() {
+    return isIncomeString(type.value) ? incomeFee.value : expendFee.value
+  },
+  set(value: number | '') {
+    if (isIncomeString(type.value)) {
+      incomeFee.value = value
+    } else {
+      expendFee.value = value
+    }
+  },
+})
+
+const rates = computed<number | ''>({
+  get() {
+    return isIncomeString(type.value) ? incomeRates.value : expendRates.value
+  },
+  set(value: number | '') {
+    if (isIncomeString(type.value)) {
+      incomeRates.value = value
+    } else {
+      expendRates.value = value
+    }
+  },
+})
+
+const billCategories = computed<BillCategory[]>({
+  get() {
+    return isIncomeString(type.value) ? incomeCategories.value : expendCategories.value
+  },
+  set(value: BillCategory[]) {
+    if (isIncomeString(type.value)) {
+      incomeCategories.value = value
+    } else {
+      expendCategories.value = value
+    }
+  },
 })
 
 watch(
@@ -291,6 +319,25 @@ onLoad((option) => {
     navbarTitle.value = '编辑账单'
   }
 })
+
+// 计算总额
+const computedAmount = (type: string) => {
+  const categoryTotal = isIncomeString(type)
+    ? incomeCategories.value.map((item) => item.total).reduce((a, b) => a + b, 0)
+    : expendCategories.value.map((item) => item.total).reduce((a, b) => a + b, 0)
+  // console.log('总计', total.value, rates.value)
+  let feeNum = 0
+  let ratesNum = 0
+  if (isIncomeString(type)) {
+    feeNum = isNaN(Number(incomeFee.value)) ? 0 : Number(incomeFee.value)
+    ratesNum = (isNaN(Number(incomeRates.value)) ? 0 : Number(incomeRates.value)) * 0.01 // 提成按百分比算
+  } else {
+    feeNum = isNaN(Number(expendFee.value)) ? 0 : Number(expendFee.value)
+    ratesNum = isNaN(Number(expendRates.value)) ? 0 : Number(expendRates.value)
+  }
+  // console.log(ratesNum)
+  return parseFloat((categoryTotal + feeNum * ratesNum).toFixed(2))
+}
 
 const handleClickLeft = () => {
   uni.navigateBack({
@@ -332,37 +379,21 @@ const handleConfirmBillCategory = (category: BillCategory) => {
 }
 
 const handleChangeType = ({ value }) => {
-  const isExpend = isExpendString(value)
-
   // 支出: 1, 收入: 2
   bill.value.type = getBillType(value)
-
-  // 备份已有分类，切换分类
-  if (isExpend) {
-    // 收入切换为支出，则备份收入
-    incomeCategories.value = billCategories.value
-    incomeFee.value = total.value
-    incomeRates.value = rates.value
-  } else {
-    expendCategories.value = billCategories.value
-    expendFee.value = total.value
-    expendRates.value = rates.value
-  }
-  billCategories.value = isExpend ? expendCategories.value : incomeCategories.value
-  total.value = isExpend ? expendFee.value : incomeFee.value
-  rates.value = isExpend ? expendRates.value : incomeRates.value
 }
 
-const handleClickSave = () => {
+const handleClickSave = async () => {
   const amountNum = Number(amount.value)
-  if (amountNum <= 0) {
-    uni.showToast({ icon: 'none', title: '总金额不能为0' })
-  }
-
   saveLoading.value = true
 
   try {
     if (isModify.value) {
+      if (amountNum <= 0) {
+        uni.showToast({ icon: 'none', title: '总金额不能为0' })
+        return
+      }
+
       updateBill({
         _id: billId.value,
         total: Number(total.value),
@@ -379,19 +410,24 @@ const handleClickSave = () => {
         uni.showToast({ icon: 'none', title: '保存成功' })
       })
     } else {
-      createBill({
-        total: Number(total.value),
-        rates: Number(rates.value),
-        type: bill.value.type,
-        amount: amountNum,
-        address: bill.value.address,
-        counter: bill.value.counter,
-        subCounter: bill.value.subCounter,
-        remark: bill.value.remark,
-        date: bill.value.date,
-        categories: billCategories.value,
-      }).then((res) => {
-        addBillAc(res)
+      // 同时获取输入的支出，收入
+      const bills = getCreateBills()
+      if (bills.length <= 0) {
+        uni.showToast({ icon: 'none', title: '账单收入或支出总金额不能0' })
+        return
+      }
+
+      // 批量插入账单
+      Promise.all(bills.map((bill) => createBill(bill))).then((res) => {
+        // console.log('创建完成账单：', res)
+        res.forEach((b, index) => {
+          setTimeout(
+            () => {
+              addBillAc(b)
+            },
+            index === 0 ? 0 : 500,
+          )
+        })
         uni.showToast({ icon: 'none', title: '保存成功' })
         uni.navigateBack()
       })
@@ -432,6 +468,49 @@ const getBillDetail = (id: string) => {
     if (res.total !== 0) rates.value = res.rates
     billCategories.value = res.categories
   })
+}
+
+const getCreateBills = () => {
+  const bills = []
+
+  // 支出
+  const expend = '支出'
+  const expendAmount = computedAmount(expend)
+  if (expendAmount > 0) {
+    bills.push({
+      total: Number(expendFee.value),
+      rates: Number(expendRates.value),
+      type: getBillType(expend),
+      amount: expendAmount,
+      address: bill.value.address,
+      counter: bill.value.counter,
+      subCounter: bill.value.subCounter,
+      remark: bill.value.remark,
+      date: bill.value.date,
+      categories: expendCategories.value,
+    })
+  }
+
+  // 收入
+  const income = '收入'
+  const incomeAmount = computedAmount(income)
+  if (incomeAmount > 0) {
+    bills.push({
+      total: Number(incomeFee.value),
+      rates: Number(incomeRates.value),
+      type: getBillType(income),
+      amount: incomeAmount,
+      address: bill.value.address,
+      counter: bill.value.counter,
+      subCounter: bill.value.subCounter,
+      remark: bill.value.remark,
+      date: bill.value.date,
+      categories: incomeCategories.value,
+    })
+  }
+
+  // console.log('创建的账单：', bills)
+  return bills
 }
 </script>
 
