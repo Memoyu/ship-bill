@@ -93,7 +93,7 @@ watch(
         incomeCount: isIncomeType(add.type) ? 1 : 0,
       })
       // 排序
-      reports.value.sort((a, b) => Date.parse(a.date) - Date.parse(b.date))
+      reports.value.sort((a, b) => Date.parse(b.date) - Date.parse(a.date))
     }
   },
 )
@@ -184,7 +184,7 @@ watch(
             incomeCount: isIncomeType(newBill.type) ? 1 : 0,
           })
           // 排序
-          reports.value.sort((a, b) => Date.parse(a.date) - Date.parse(b.date))
+          reports.value.sort((a, b) => Date.parse(b.date) - Date.parse(a.date))
         }
       }
     }

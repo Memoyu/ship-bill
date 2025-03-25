@@ -106,10 +106,10 @@ exports.main = async (event, context) => {
 
     item.oilAmount = parseFloat((item.oilAmount).toFixed(2));
     item.commission = parseFloat((item.commission).toFixed(2));
-    item.address = addresses.join('\n');
-    item.counter = counters.join('\n');
-    item.subCounter = subCounters.join('\n');
-    item.remark = remarks.join('\n');
+    item.address = unique(addresses).join('\n');
+    item.counter = unique(counters).join('\n');
+    item.subCounter = unique(subCounters).join('\n');
+    item.remark = unique(remarks).join('\n');
 
     if (amount > 0) {
       reports.push(item)
@@ -130,3 +130,7 @@ exports.main = async (event, context) => {
     summary
   };
 };
+
+function unique(arr) {
+  return Array.from(new Set(arr))
+}

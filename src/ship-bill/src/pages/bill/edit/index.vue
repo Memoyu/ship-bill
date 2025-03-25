@@ -425,7 +425,7 @@ const handleClickSave = async () => {
             () => {
               addBillAc(b)
             },
-            index === 0 ? 0 : 500,
+            index === 0 ? 0 : 200,
           )
         })
         uni.showToast({ icon: 'none', title: '保存成功' })
